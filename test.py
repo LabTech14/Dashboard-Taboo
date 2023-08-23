@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[21]:
-
-
 import os
 import dash
 from dash import dcc, html
@@ -25,8 +19,8 @@ warnings.filterwarnings("ignore")
 
 
 # Chemin du répertoire contenant les fichiers Excel
-input_directory = 'input'
-fina = pd.read_csv(r'non.csv')
+input_directory = 'C:\\Users\\Administrateur\\Desktop\\code\\input'
+fina = pd.read_csv('C:\\Users\\Administrateur\\Desktop\\code\\non.csv')
 
 
 ############################################## exploration et traitements des données #####################################
@@ -107,7 +101,7 @@ sheet_name = "RH"
 df = pd.read_excel(excel_file, sheet_name)
 
 # Ouvrir un nouveau fichier Excel pour sauvegarder le contenu traité
-new_excel_file = "ChargePersonnel.xlsx"
+new_excel_file = "RH.xlsx"
 with pd.ExcelWriter(new_excel_file, engine="xlsxwriter") as writer:
     # Enregistrer le DataFrame d'origine dans le nouveau fichier Excel
     df.to_excel(writer, sheet_name="RH", index=False)
@@ -115,7 +109,7 @@ with pd.ExcelWriter(new_excel_file, engine="xlsxwriter") as writer:
 # Lire le nouveau fichier Excel pour le traitement ultérieur
 df_new = pd.read_excel(new_excel_file, sheet_name="RH")
 
-# Sélectionner uniquement la colonne "Date" et la colonne "ChargePersonnel"
+# Sélectionner uniquement la colonne "Date" et la colonne "RH"
 df_filtered = df_new[['Date ', "RH"]]
 
 # Supprimer les lignes vides ou égales à 0
@@ -123,10 +117,10 @@ df_filtered = df_filtered.dropna(subset=['Date ', "RH"])
 df_filtered = df_filtered[(df_filtered != 0).all(axis=1)]
 
 # Transformer la colonne "Date" au format de date
-df_filtered['Date '] = pd.to_datetime(df_filtered['Date '], format="%Y-%m-%d %H:%M:%S")  # Adapter le format au format réel dans votre fichier
+df_filtered['Date '] = pd.to_datetime(df_filtered['Date '], format='%d/%m/%Y')  # Adapter le format au format réel dans votre fichier
 
 # Enregistrer le DataFrame filtré dans un autre fichier Excel
-new_filtered_excel_file = "ChargePersonnel.xlsx"
+new_filtered_excel_file = "RH.xlsx"
 df_filtered.to_excel(new_filtered_excel_file, index=False)
 
 print(f"Données filtrées enregistrées dans '{new_filtered_excel_file}'.")
@@ -158,33 +152,16 @@ df0 = merged_copy
 ########Calculer le total par colonne :#########
 
 # Somme de chaque colonne
-#total_par_colonne = df0.sum()
-# Sélectionner uniquement les colonnes numériques (excluant la colonne "Date")
-numeric_columns = df0.select_dtypes(include=["number"])
+total_par_colonne = df0.sum()
 
-# Calculer la somme des colonnes numériques
-sum_by_column = numeric_columns.sum()
-
-# Sélectionner uniquement les colonnes numériques (excluant la colonne "Date")
-numeric_columns = df.select_dtypes(include=["number"])
-
-# Calculer la somme des colonnes numériques par ligne (axis=1)
-sum_by_row = numeric_columns.sum(axis=1)
-
+# Somme de chaque ligne
+total_par_ligne = df0.sum(axis=1)
 
 
 ######Coûts des produits vendus##########
 
 # Liste des colonnes à inclure dans le calcul
-colonnes_ = [  "DRINK", "MIAMI 228 ", "PICASSO", "GLACONS"]
-
-# Ajouter une colonne "Coûts des produits vendus"
-df0["DRINKS"] = df0[colonnes_].sum(axis=1)
-
-
-# Liste des colonnes à inclure dans le calcul
-df0["EATS"] = df0["EAT"] + df0["GAZ"]
-colonnes_a_inclure = ["SMOKE", "EATS", "DRINKS"]
+colonnes_a_inclure = ["SMOKE", "EAT", "GAZ", "DRINK", "MIAMI 228 ", "PICASSO", "GLACONS"]
 
 # Ajouter une colonne "Coûts des produits vendus"
 df0["Coûts des produits vendus"] = df0[colonnes_a_inclure].sum(axis=1)
@@ -261,7 +238,7 @@ df0["Taux marge brute"] = (df0["Marge brute"]/df0["CA"])*100
 # Liste des colonnes à inclure dans le calcul
 col = ['MONNAIE', 
        'CREDIT TEL', 'INTERNET / TV', 'LOYERS',
-        'ENTRETIEN ', 'TRANSPORT', 'AUTRE']
+       'CONSOMMABLES', 'ENTRETIEN ', 'TRANSPORT', 'AUTRE']
 
 # Ajouter une colonne "Autres"
 df0["Autres"] = df0[col].sum(axis=1)
@@ -271,7 +248,7 @@ df0["Autres"] = df0[col].sum(axis=1)
 col1 = [ 'MARKETING', 'ADMINISTRATIF']
 
 # Ajouter une colonne "MARKETINGADMINISTRATIF"
-df0["MARKETING_ADMIN"] = df0[col1].sum(axis=1)
+df0["MARKETINGADMINISTRATIF"] = df0[col1].sum(axis=1)
 
 
 # Liste des colonnes à afficher
@@ -295,10 +272,10 @@ df0['Mois'] = df0['Date '].dt.to_period('M')
 
 # Liste des colonnes pour le TCD
 columns_for_tcd = ['Mois', "CA",'Coûts des produits vendus', 'Marge brute','CACHETS', 'CASH POWER',
-                   "MARKETING_ADMIN",'RH',"Autres",'OPEX', 'Resultat d\'exploitation',
+                   "MARKETINGADMINISTRATIF",'RH',"Autres",'OPEX', 'Resultat d\'exploitation',
                    'Resultat avant Impôts', 'Resultat net comptable', 'Tresorerie net d\'exploitation',
                    'Travaux et equipements', 'Tresorerie net d\'investissement', 'Resultat net',
-                   'Working Capital', 'Trésorerie Fin de Mois', 'Taux marge brute','CONSOMMABLES',"DRINKS","EATS","SMOKE"]
+                   'Working Capital', 'Trésorerie Fin de Mois', 'Taux marge brute']
 
 # Créer le TCD en groupant par mois
 tcd = df0[columns_for_tcd].groupby('Mois').sum()
@@ -389,7 +366,7 @@ inventaire2_df['Quantité Relative'] = inventaire2_df['Total Qté'] / sous_cat_s
 
 
 # Chemin du répertoire où vous voulez enregistrer le fichier Excel
-output_directory = 'inputcons'
+output_directory = 'C:\\Users\\Administrateur\\Desktop\\code\\inputcons'
 
 # Vérifier si le répertoire existe, sinon le créer
 if not os.path.exists(output_directory):
@@ -503,7 +480,7 @@ def generate_sunburst_item_category(filtered_df):
 def generate_sunburst_subcategory_within_category(filtered_df):
     
     fina_grouped = fina.groupby('Mois').sum().reset_index()
-    fig = px.line(fina_grouped, x='Mois', y=['CACHETS', 'CASH POWER', 'MARKETING_ADMIN', 'RH','CONSOMMABLES', 'Autres'],
+    fig = px.line(fina_grouped, x='Mois', y=['CACHETS', 'CASH POWER', 'MARKETINGADMINISTRATIF', 'RH', 'Autres'],
                   title='')#Évolution des Charges Opérationnelles
 
     #fig.update_xaxes(categoryorder='category ascending')  # Ajoute cette ligne pour corriger l'ordre des mois
@@ -517,128 +494,43 @@ def generate_sunburst_subcategory_within_category(filtered_df):
 
 #########    5    ########
 def generate_bar_weight_on_revenue(filtered_df):
+    fina_grouped = fina.groupby('Mois').sum().reset_index()
+    fig = px.pie(fina_grouped, values='CA', names='Mois', title='')#Répartition du CA sur les Mois
 
-    
-    fina['Marge Nette'] = fina['Resultat net'] / fina['CA']
-    fina['Taux de Marque'] = (fina['Marge brute'] / fina['CA']) * 100
-
-    colors = px.colors.qualitative.Set1  # Changer Set1 à une autre palette de couleurs si désiré
-
-    fig = go.Figure()
-
-    # Ajouter une trace de barres pour la marge nette
-    fig.add_trace(go.Bar(x=fina['Mois'], y=fina['Marge Nette'], name='Marge Nette', marker_color=colors[0]))
-
-    # Ajouter une trace de ligne pour le taux de marque avec un axe y secondaire
-    fig.add_trace(go.Scatter(x=fina['Mois'], y=fina['Taux de Marque'], mode='lines', yaxis='y2',
-                             name='Taux de Marque', line=dict(color=colors[1])))
-
-    # Personnalisation de l'axe y2 (axe de droite)
-    fig.update_layout(yaxis2=dict(anchor='x', overlaying='y', side='right'))
-
-    # Personnalisation du titre et des axes
+     # Personnalisation du style du titre
     fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois', yaxis_title='Marge Nette', yaxis2_title='Taux de Marque')
-
+                      title_x=0.5, xaxis_title='Mois', yaxis_title='Chiffre d\'affaires')
+    #fig.update_layout()
+    
     return fig
+
+
+#########   6   ########
+def generate_box_category_revenue(filtered_df):
     
-   
-
-
- #########   6   ########
-
-def generate_box(filtered_df):
-    
-    
-    fig = go.Figure()
-
-    categories = ['Coûts des produits vendus', 'Marge brute']
-
-    for category in categories:
-        relative_values = fina[category] / fina[categories].sum(axis=1) * 100
-        fig.add_trace(go.Scatter(x=fina['Mois'], y=fina[category], name=category))
-        bar_trace = go.Bar(x=fina['Mois'], y=fina[category], name=f'{category} (Bar)')
-        fig.add_trace(bar_trace)
-
-        for i, value in enumerate(relative_values):
-            bar_trace.hoverinfo = 'y+text'
-            fig.add_trace(go.Scatter(
-                x=[fina['Mois'][i]],
-                y=[fina[category][i]],
-                mode='markers',
-                marker=dict(size=1),
-                text=[f"{value:.2f}%"],
-                hoverinfo='text',
-                showlegend=False
-            ))
-
-    # Personnalisation du titre et des axes
-    fig.update_layout(title_text='',#Coûts des produits vendus et Marge brute
-                      title_x=0.5, xaxis_title='Mois', yaxis_title='Montant / Pourcentage')
-
+    fig = px.line(fina, x='Mois', y=['Coûts des produits vendus', 'Marge brute'],
+                  labels={'value': 'Montant', 'variable': 'Catégorie'},
+                  title='')#Coûts des produits vendus et Marge brute
     return fig
 
 
 #########    7    ########
-def generate(filtered_df):
-    
-    fig = go.Figure()
+def generate_box_total_revenue(filtered_df):
+    fina_grouped = fina.groupby('Mois').sum().reset_index()
+    fig = px.bar(fina_grouped, x='Mois', y=['Tresorerie net d\'exploitation', 'Tresorerie net d\'investissement'],
+                  title='')#Évolution des Flux de Trésorerie
 
-    # Ajouter une trace de barres empilées pour le chiffre d'affaires et le coût des produits vendus
-    fig.add_trace(go.Bar(x=fina['Mois'], y=fina['Coûts des produits vendus'], name='Coûts des produits vendus'))
-    fig.add_trace(go.Bar(x=fina['Mois'], y=fina['CA'], name='Chiffre d\'affaires'))
-
-    # Personnalisation du titre et des axes
-    fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois', yaxis_title='Montant')
-#Chiffre d\'affaires vs Coûts des produits vendus
-    # Empiler les barres
-    fig.update_layout(barmode='stack')
+    fig.update_layout(
+        barmode='relative',  # Afficher les barres relatives aux valeurs positives et négatives
+        bargap=0.1,  # Espacement entre les groupes de barres
+        xaxis=dict(title='Mois'),
+        yaxis=dict(title='Montant'),
+        legend_title='Catégorie'
+    )
 
     return fig
 
-#########    8   ########
-#def generate_(filtered_df):
-#    fina_grouped = fina.groupby('Mois').sum().reset_index()
-#    fig = px.box(fina_grouped, x='Mois', y=['Tresorerie net d\'exploitation', 'Tresorerie net d\'investissement'],
-#                 title='Évolution des Flux de Trésorerie')
 
-#    fig.update_layout(
-#        xaxis=dict(title='Mois'),
-#        yaxis=dict(title='Montant'),
-#        legend_title='Catégorie'
-#    )
-
-#    return fig
-
-def generate_(filtered_df):
-    fig = go.Figure()
-
-    categories = ['DRINKS', 'EATS', 'SMOKE']
-
-    for category in categories:
-        relative_values = fina[category] / fina[categories].sum(axis=1) * 100
-        fig.add_trace(go.Scatter(x=fina['Mois'], y=fina[category], name=category))
-        bar_trace = go.Bar(x=fina['Mois'], y=fina[category], name=f'{category} (Bar)')
-        fig.add_trace(bar_trace)
-
-        for i, value in enumerate(relative_values):
-            bar_trace.hoverinfo = 'y+text'
-            fig.add_trace(go.Scatter(
-                x=[fina['Mois'][i]],
-                y=[fina[category][i]],
-                mode='markers',
-                marker=dict(size=1),
-                text=[f"{value:.2f}%"],
-                hoverinfo='text',
-                showlegend=False
-            ))
-
-    # Personnalisation du titre et des axes
-    fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois', yaxis_title='Montant / Pourcentage')
-
-    return fig
 # Création du tableau de bord
 app = dash.Dash(__name__)
 
@@ -802,7 +694,7 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
             html.Div([
                 html.Div([
                     html.Div([
-                        html.H1("Aucune données disponibles pour les sélections faites."),
+                        html.H1("Aucune donnée disponible pour les sélections faites."),
                     ], className="inner p-2"),
                 ])
             ], className="small-box bg-danger")
@@ -814,9 +706,8 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
     fig_sunburst_item_category = generate_sunburst_item_category(filtered_df)
     fig_sunburst_subcategory_within_category = generate_sunburst_subcategory_within_category(filtered_df)
     fig_bar_weight_on_revenue = generate_bar_weight_on_revenue(filtered_df)
-    fig_box_category_revenue = generate_box(filtered_df)
-    fig_box_total_revenue = generate(filtered_df)
-    fig_box_total_revenu = generate_(filtered_df)
+    fig_box_category_revenue = generate_box_category_revenue(filtered_df)
+    fig_box_total_revenue = generate_box_total_revenue(filtered_df)
 
     return html.Div([
             html.Div([
@@ -874,11 +765,11 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
             html.Div([
                 html.Div([
                     html.Div([
-                        html.H3("Répartition du chiffres d'affaires", className="card-title")
+                        html.H3("Répartition du CA sur les Mois", className="card-title")
                     ], className="card-header"),
                     html.Div([
                         html.Div([
-                            html.Div(dcc.Graph(figure=fig_box_total_revenu.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                            html.Div(dcc.Graph(figure=fig_bar_weight_on_revenue.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
                         ], className="card-body pad table-responsive p-0")
                     ], className="card-body")
                 ], className="card card-primary card-outline")
@@ -908,36 +799,10 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
                         ], className="card-body pad table-responsive p-0")
                     ], className="card-body")
                 ], className="card card-primary card-outline")
-            ], className="col-md-6"),
-        
-       html.Div([
-            html.Div([
-                html.Div([
-                    html.H3("Évolution des Flux de Trésorerie", className="card-title")
-                ], className="card-header"),
-                html.Div([
-                    html.Div([
-                        html.Div(dcc.Graph(figure=fig_bar_weight_on_revenue.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
-                    ], className="card-body pad table-responsive p-0")
-                ], className="card-body")
-            ], className="card card-primary card-outline")
-        ], className="col-md-6"),
-
+            ], className="col-md-12")
 
         ], className="row")
 
-
-
-
-# Récupére le port attribué par Heroku depuis la variable d'environnement
-port = int(os.environ.get('PORT', 8050))  
-
-# Créer et exécuter votre application Dash en écoutant sur le port attribué
 if __name__ == '__main__':
-    app.run_server(host='0.0.0.0', port=port)
-
-# In[ ]:
-
-
-
+    app.run_server(debug=True, port=5516)
 
