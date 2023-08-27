@@ -25,16 +25,16 @@ warnings.filterwarnings("ignore")
 
 
 # Chemin du répertoire contenant les fichiers Excel
-input_directory = 'input'
-fina = pd.read_csv(r'non.csv')
+input_directory = r'C:\Users\LP\Desktop\Resto\Resto\input'
+fina = pd.read_csv(r'C:\Users\LP\Desktop\Resto\Resto\non.csv')
 
 
 ############################################## exploration et traitements des données #####################################
 
-# Remplacez 'votre_fichier.xlsx' par le nom de votre fichier Excel
-excel_file = "Analyse TB2023.xlsx"
+# Chemin du répertoire du fichier Analyse TB2023
+excel_file = r"C:\Users\LP\Desktop\Resto\Resto\Analyse TB2023.xlsx"
 
-# Remplacez 'Feuille1' et 'Feuille3' par les noms des feuilles que vous souhaitez consolider
+# Choisir les feuilles a sélectionnées pour le chiffre d'affaire monthly du fichier Analyse TB2023 que vous souhaitez consolider
 sheets_to_consolidate = ['AVRIL 23', 'MAI 23', 'JUIN 23', 'JUILLET 23'] 
 
 # Charger les feuilles spécifiées en un dictionnaire de DataFrames
@@ -61,7 +61,7 @@ consolidated_sheet.to_excel(consolidated_excel_file, index=False)
 ################################################### 2 #############################################################################
 
 # Ouvrir le fichier Excel "Analyse TB2023.xlsx" et charger la feuille "Détail Dépenses"
-excel_file = "Analyse TB2023.xlsx"
+excel_file = r"C:\Users\LP\Desktop\Resto\Resto\Analyse TB2023.xlsx"
 sheet_name =  "Détail Dépenses"
 
 df = pd.read_excel(excel_file, sheet_name)
@@ -101,8 +101,8 @@ print(f"Données de la feuille '{sheet_name}' traitées et enregistrées dans '{
 
 ###################################################  4  #######################################################################
 
-# Charger les données de la feuille "RH" depuis le fichier Excel
-excel_file = "Analyse TB2023.xlsx"
+# Charger les données de la feuille "RH" depuis le fichier Excel Analyse TB2023
+excel_file = r"C:\Users\LP\Desktop\Resto\Resto\Analyse TB2023.xlsx"
 sheet_name = "RH"
 df = pd.read_excel(excel_file, sheet_name)
 
@@ -123,7 +123,8 @@ df_filtered = df_filtered.dropna(subset=['Date ', "RH"])
 df_filtered = df_filtered[(df_filtered != 0).all(axis=1)]
 
 # Transformer la colonne "Date" au format de date
-df_filtered['Date '] = pd.to_datetime(df_filtered['Date '], format="%Y-%m-%d %H:%M:%S")  # Adapter le format au format réel dans votre fichier
+#df_filtered['Date '] = pd.to_datetime(df_filtered['Date '], format="%Y-%m-%d %H:%M:%S")  # Adapter le format au format réel dans votre fichier
+df_filtered["Date "] = pd.to_datetime(df_filtered["Date "], format="%Y-%m-%d %H:%M:%S", errors='coerce')
 
 # Enregistrer le DataFrame filtré dans un autre fichier Excel
 new_filtered_excel_file = "ChargePersonnel.xlsx"
@@ -166,7 +167,7 @@ numeric_columns = df0.select_dtypes(include=["number"])
 sum_by_column = numeric_columns.sum()
 
 # Sélectionner uniquement les colonnes numériques (excluant la colonne "Date")
-numeric_columns = df.select_dtypes(include=["number"])
+numeric_columns = df0.select_dtypes(include=["number"])
 
 # Calculer la somme des colonnes numériques par ligne (axis=1)
 sum_by_row = numeric_columns.sum(axis=1)
@@ -182,8 +183,10 @@ colonnes_ = [  "DRINK", "MIAMI 228 ", "PICASSO", "GLACONS"]
 df0["DRINKS"] = df0[colonnes_].sum(axis=1)
 
 
-# Liste des colonnes à inclure dans le calcul
+# Création de la colonne eats qui regroupe la colonne eta et gaz 
 df0["EATS"] = df0["EAT"] + df0["GAZ"]
+
+# Les colonnes a inclures dans le calcul du coûts des produits vendus
 colonnes_a_inclure = ["SMOKE", "EATS", "DRINKS"]
 
 # Ajouter une colonne "Coûts des produits vendus"
@@ -191,14 +194,14 @@ df0["Coûts des produits vendus"] = df0[colonnes_a_inclure].sum(axis=1)
 
 
 
-##################################################
+###############################################################################################################################
 
-########## Marge brute#######
+##################################################### Marge brute##############################################################
 
 # Créer la nouvelle colonne "Marge brute"
 df0["Marge brute"] = df0["CA"] - df0["Coûts des produits vendus"]
 
-########## Charge operationnel ##########
+##################################################### Charge operationnel ####################################################
 
 # Liste des colonnes à inclure dans le calcul
 colonnesinclure = ['CACHETS',  'CASH POWER',
@@ -210,26 +213,26 @@ colonnesinclure = ['CACHETS',  'CASH POWER',
 # Ajouter une colonne "OPEX"
 df0["OPEX"] = df0[colonnesinclure].sum(axis=1)
 
-########## Resultat d'exploitation ##########
+################################################### Resultat d'exploitation #################################################
 
 df0["Resultat d'exploitation"] = df0["Marge brute"] - df0["OPEX"]
 
-########## Resultat avant Impôts ##########
+################################################### Resultat avant Impôts ####################################################
 
 ChargesInterets = 0
 df0["Resultat avant Impôts"] = df0["Resultat d'exploitation"] - ChargesInterets
 
-########## Resultat net comptable ##########
+################################################### Resultat net comptable ###################################################
 
 Taxes = 0
 df0["Resultat net comptable"] = df0["Resultat avant Impôts"] - Taxes
 
- ########## Tresorerie net d'exploitation ##########
+ ################################################## Tresorerie net d'exploitation ###########################################
 
 
 df0["Tresorerie net d'exploitation"] = df0["Resultat net comptable"]
 
-########## Travaux et equipements ##########
+################################################### Travaux et equipements ###################################################
 
 # Liste des colonnes à inclure dans le calcul
 colonnescal = ['EQUIPEMENTS','TRAVAUX']
@@ -255,7 +258,8 @@ df0["Trésorerie Fin de Mois"] = df0["Working Capital"]
 
 ########## Taux marge brute ##########
 
-df0["Taux marge brute"] = (df0["Marge brute"]/df0["CA"])*100
+#df0["Taux marge brute"] = df0["Marge brute"]/df0["CA"]
+#df0["TMB"] = df0["Marge brute"]/df0["CA"]
 
 
 # Liste des colonnes à inclure dans le calcul
@@ -298,15 +302,19 @@ columns_for_tcd = ['Mois', "CA",'Coûts des produits vendus', 'Marge brute','CAC
                    "MARKETING_ADMIN",'RH',"Autres",'OPEX', 'Resultat d\'exploitation',
                    'Resultat avant Impôts', 'Resultat net comptable', 'Tresorerie net d\'exploitation',
                    'Travaux et equipements', 'Tresorerie net d\'investissement', 'Resultat net',
-                   'Working Capital', 'Trésorerie Fin de Mois', 'Taux marge brute','CONSOMMABLES',"DRINKS","EATS","SMOKE"]
+                   'Working Capital', 'Trésorerie Fin de Mois','CONSOMMABLES',"DRINKS","EATS","SMOKE"]
 
 # Créer le TCD en groupant par mois
 tcd = df0[columns_for_tcd].groupby('Mois').sum()
 
+#calcul du Taux de Marge brute après le groupeby
+#tcd = df0[columns_for_tcd].groupby('Mois').sum()
+tcd["Taux marge brute"] = (tcd["Marge brute"])/(tcd["CA"])
+
 # Afficher le tableau croisé dynamique
 #tcd
 # Enregistrer le DataFrame filtré dans un autre fichier Excel
-new_filtered_excel_file = "non.csv"
+new_filtered_excel_file = r"C:\Users\LP\Desktop\Resto\Resto\non.csv"
 tcd.to_csv(new_filtered_excel_file, index=True)
 
 print(f"Données consolidées et enregistrées dans '{new_filtered_excel_file}'.")
@@ -337,7 +345,7 @@ inventaire2_df = consolidated_df
 inventaire2_df.rename(columns={"Famille/Produit": "Item"}, inplace=True)
 
 # Charger le DataFrame de correspondance
-correspondances_df = pd.read_excel("correspondances.xlsx")
+correspondances_df = pd.read_excel(r"C:\Users\LP\Desktop\Resto\Resto\correspondances.xlsx")
 
 # Créer les nouvelles colonnes "Catégorie" et "Sous-catégorie"
 inventaire2_df["Catégorie"] = ""
@@ -457,24 +465,65 @@ def generate_pie_chart_weight_on_revenue(filtered_df):
 
 
 #########    2    ########
+#def generate_treemap_item_subcategory(filtered_df):
+
+
 def generate_treemap_item_subcategory(filtered_df):
     df = filtered_df.copy()
-    total_relative_quantity = df['Quantité Relative'].sum()
-    df['PctRelative'] = df['Quantité Relative'] / total_relative_quantity * 100  # Calcul du pourcentage
+    total_revenue = df['Total HT'].sum()
+
+    df['Poids'] = df['Total HT'] / total_revenue * 100  # Calcul du poids en pourcentage
 
     fig = px.treemap(df, path=['Catégorie', 'Sous-catégorie', 'Item'],
-                     values='PctRelative',  # Utilisation des pourcentages calculés
-                     custom_data=['PctRelative'],  # Stockage des pourcentages dans les données personnalisées
-                     color='Sous-catégorie')
+                     values='Poids',  # Utilisation des poids calculés
+                     color='Sous-catégorie',
+                     labels={'Poids': 'Poids (%)'})  # Définir le label pour la colonne 'Poids'
 
     fig.update_layout()
 
     fig.update_traces(
-        hovertemplate='<b>%{label}</b><br>Poids: %{customdata[0]:.2f}%',  # Format en pourcentage avec 2 décimales
-        textinfo='label+percent entry'  # Affiche le label de la catégorie et le pourcentage
+        hovertemplate='<b>%{label}</b><br>Poids: %{value:.2f}%',  # Format avec 2 décimales
+        textinfo='label+percent entry',  # Affiche le label de la catégorie et le pourcentage
+        textposition='middle center'  # Centre l'affichage du texte
+    )
+
+    fig.update_traces(
+        texttemplate='%{label}<br>Poids: %{value:.2f}%'
     )
 
     return fig
+
+
+
+#########    2 b   ########
+#def generate_treemap_item_subcategory(filtered_df):
+
+
+def generate_treemap_subcategory(filtered_df):
+    df = filtered_df.copy()
+    total_revenue = df['Total HT'].sum()
+
+    df['Poids'] = df['Total HT'] / total_revenue * 100  # Calcul du poids en pourcentage
+
+    fig = px.treemap(df, path=['Catégorie', 'Sous-catégorie'],
+                     values='Poids',  # Utilisation des poids calculés
+                     color='Sous-catégorie',
+                     labels={'Poids': 'Poids (%)'})  # Définir le label pour la colonne 'Poids'
+
+    fig.update_layout()
+
+    fig.update_traces(
+        hovertemplate='<b>%{label}</b><br>Poids: %{value:.2f}%',  # Format avec 2 décimales
+        textinfo='label+percent entry',  # Affiche le label de la catégorie et le pourcentage
+        textposition='middle center'  # Centre l'affichage du texte
+    )
+
+    fig.update_traces(
+        texttemplate='%{label}<br>Poids: %{value:.2f}%'
+    )
+
+    return fig
+
 
 
 #########    3    ########
@@ -519,26 +568,26 @@ def generate_sunburst_subcategory_within_category(filtered_df):
 def generate_bar_weight_on_revenue(filtered_df):
 
     
-    fina['Marge Nette'] = fina['Resultat net'] / fina['CA']
-    fina['Taux de Marque'] = (fina['Marge brute'] / fina['CA']) * 100
+    fina['Profitabilité'] = fina['Resultat net'] / fina['CA']
+    #fina['Taux marge brute'] = (fina['Marge brute'] / fina['CA']) * 100
 
     colors = px.colors.qualitative.Set1  # Changer Set1 à une autre palette de couleurs si désiré
 
     fig = go.Figure()
 
-    # Ajouter une trace de barres pour la marge nette
-    fig.add_trace(go.Bar(x=fina['Mois'], y=fina['Marge Nette'], name='Marge Nette', marker_color=colors[0]))
+    # Ajouter une trace de barres pour la Profitabilité
+    fig.add_trace(go.Bar(x=fina['Mois'], y=fina['Profitabilité'], name='Profitabilité', marker_color=colors[0]))
 
-    # Ajouter une trace de ligne pour le taux de marque avec un axe y secondaire
-    fig.add_trace(go.Scatter(x=fina['Mois'], y=fina['Taux de Marque'], mode='lines', yaxis='y2',
-                             name='Taux de Marque', line=dict(color=colors[1])))
+    # Ajouter une trace de ligne pour le Taux marge brute avec un axe y secondaire
+    fig.add_trace(go.Scatter(x=fina['Mois'], y=fina['Taux marge brute'], mode='lines', yaxis='y2',
+                             name='Taux marge brute', line=dict(color=colors[1])))
 
     # Personnalisation de l'axe y2 (axe de droite)
     fig.update_layout(yaxis2=dict(anchor='x', overlaying='y', side='right'))
 
     # Personnalisation du titre et des axes
     fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois', yaxis_title='Marge Nette', yaxis2_title='Taux de Marque')
+                      title_x=0.5, xaxis_title='Mois', yaxis_title='Profitabilité', yaxis2_title='Taux marge brute')
 
     return fig
     
@@ -557,7 +606,7 @@ def generate_box(filtered_df):
     for category in categories:
         relative_values = fina[category] / fina[categories].sum(axis=1) * 100
         fig.add_trace(go.Scatter(x=fina['Mois'], y=fina[category], name=category))
-        bar_trace = go.Bar(x=fina['Mois'], y=fina[category], name=f'{category} (Bar)')
+        bar_trace = go.Bar(x=fina['Mois'], y=fina[category], name=f'{category}')
         fig.add_trace(bar_trace)
 
         for i, value in enumerate(relative_values):
@@ -619,7 +668,7 @@ def generate_(filtered_df):
     for category in categories:
         relative_values = fina[category] / fina[categories].sum(axis=1) * 100
         fig.add_trace(go.Scatter(x=fina['Mois'], y=fina[category], name=category))
-        bar_trace = go.Bar(x=fina['Mois'], y=fina[category], name=f'{category} (Bar)')
+        bar_trace = go.Bar(x=fina['Mois'], y=fina[category], name=f'{category}')
         fig.add_trace(bar_trace)
 
         for i, value in enumerate(relative_values):
@@ -639,6 +688,26 @@ def generate_(filtered_df):
                       title_x=0.5, xaxis_title='Mois', yaxis_title='Montant / Pourcentage')
 
     return fig
+
+################################################ 9 #################################################################
+
+
+def total_revenue(filtered_df):
+    fina_grouped = fina.groupby('Mois').sum().reset_index()
+    fig = px.bar(fina_grouped, x='Mois', y=['Tresorerie net d\'exploitation', 'Tresorerie net d\'investissement'],
+                  title='')#Évolution des Flux de Trésorerie
+
+    fig.update_layout(
+        barmode='relative',  # Afficher les barres relatives aux valeurs positives et négatives
+        bargap=0.1,  # Espacement entre les groupes de barres
+        xaxis=dict(title='Mois'),
+        yaxis=dict(title='Montant'),
+        legend_title='Catégorie'
+    )
+
+    return fig
+
+
 # Création du tableau de bord
 app = dash.Dash(__name__)
 
@@ -660,7 +729,8 @@ app.layout = html.Div([
         html.Div([
             html.Div([
                 html.Div([
-                    html.H1("Dashboard d'analyse des données", className="m-0")
+                    html.H1("DASHBOARD D'ANALYSE DES DONNEES", className="m-0",
+                            style={'font-weight': 'bold', 'font-size': '36px'})  # Ajoutez ici le style CSS pour le gras et la taille de police)
                 ], className="col-sm-8"),
                 html.Div([
                     html.Ol([
@@ -817,25 +887,32 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
     fig_box_category_revenue = generate_box(filtered_df)
     fig_box_total_revenue = generate(filtered_df)
     fig_box_total_revenu = generate_(filtered_df)
+    fig_total_revenu =  total_revenue(filtered_df)
+    fig_total = generate_treemap_subcategory(filtered_df)
 
     return html.Div([
-            html.Div([
                 html.Div([
                     html.Div([
-                        html.H3("Poids de chaque catégorie sur le chiffre d'affaires global", className="card-title")
-                    ], className="card-header"),
-                    html.Div([
                         html.Div([
-                            html.Div(dcc.Graph(figure=fig_pie_chart_weight_on_revenue.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
-                        ], className="card-body pad table-responsive p-0")
-                    ], className="card-body")
-                ], className="card card-primary card-outline")
-            ], className="col-md-6"),
+                            html.H3("Poids de chaque catégorie sur le chiffre d'affaires global", 
+                                    className="card-title",
+                                    style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras
+                        ], className="card-header"),
+                        html.Div([
+                            html.Div([
+                                html.Div(dcc.Graph(figure=fig_pie_chart_weight_on_revenue.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                            ], className="card-body pad table-responsive p-0")
+                        ], className="card-body")
+                    ], className="card card-primary card-outline")
+                ], className="col-md-6"),
+
+
 
             html.Div([
                 html.Div([
                     html.Div([
-                        html.H3("Poids de chaque Item dans sa sous-catégorie", className="card-title")
+                        html.H3("Poids de chaque Item dans sa sous-catégorie", 
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras
                     ], className="card-header"),
                     html.Div([
                         html.Div([
@@ -848,7 +925,22 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
             html.Div([
                 html.Div([
                     html.Div([
-                        html.H3("Chiffre d\'affaires et Taux de Marge Brute par mois", className="card-title")
+                        html.H3("Poids de chaque sous-catégorie dans sa catégorie", 
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras
+                    ], className="card-header"),
+                    html.Div([
+                        html.Div([
+                            html.Div(dcc.Graph(figure=fig_total .update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                        ], className="card-body pad table-responsive p-0")
+                    ], className="card-body")
+                ], className="card card-primary card-outline")
+            ], className="col-md-6"),
+
+            html.Div([
+                html.Div([
+                    html.Div([
+                        html.H3("Chiffre d\'affaires et Taux de Marge Brute par mois", 
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
                     ], className="card-header"),
                     html.Div([
                         html.Div([
@@ -861,7 +953,8 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
             html.Div([
                 html.Div([
                     html.Div([
-                        html.H3("Évolution des Charges Opérationnelles", className="card-title")
+                        html.H3("Évolution des Charges Opérationnelles", 
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
                     ], className="card-header"),
                     html.Div([
                         html.Div([
@@ -874,7 +967,8 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
             html.Div([
                 html.Div([
                     html.Div([
-                        html.H3("Répartition du chiffres d'affaires", className="card-title")
+                        html.H3("Répartition du chiffres d'affaires", 
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
                     ], className="card-header"),
                     html.Div([
                         html.Div([
@@ -887,7 +981,8 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
             html.Div([
                 html.Div([
                     html.Div([
-                        html.H3("Coûts des produits vendus et Marge brute", className="card-title")
+                        html.H3("Coûts des produits vendus et Marge brute", 
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
                     ], className="card-header"),
                     html.Div([
                         html.Div([
@@ -900,7 +995,8 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
             html.Div([
                 html.Div([
                     html.Div([
-                        html.H3("Évolution des Flux de Trésorerie", className="card-title")
+                        html.H3("Rentabilité des ventes", 
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
                     ], className="card-header"),
                     html.Div([
                         html.Div([
@@ -913,7 +1009,8 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
        html.Div([
             html.Div([
                 html.Div([
-                    html.H3("Évolution des Flux de Trésorerie", className="card-title")
+                    html.H3("Profitabilite des ventes", 
+                            className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
                 ], className="card-header"),
                 html.Div([
                     html.Div([
@@ -923,11 +1020,26 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
             ], className="card card-primary card-outline")
         ], className="col-md-6"),
 
+         html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Évolution des Flux de Trésorerie",
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=fig_total_revenu.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-6"),
+
 
         ], className="row")
 
 
-
+#if __name__ == '__main__':
+    #app.run_server(debug=True, port=5517)
 
 # Récupére le port attribué par Heroku depuis la variable d'environnement
 port = int(os.environ.get('PORT', 8050))  
