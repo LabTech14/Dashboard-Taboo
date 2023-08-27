@@ -25,14 +25,14 @@ warnings.filterwarnings("ignore")
 
 
 # Chemin du répertoire contenant les fichiers Excel
-input_directory = r'C:\Users\LP\Desktop\Resto\Resto\input'
-fina = pd.read_csv(r'C:\Users\LP\Desktop\Resto\Resto\non.csv')
+input_directory = r'input'
+fina = pd.read_csv(r'non.csv')
 
 
 ############################################## exploration et traitements des données #####################################
 
 # Chemin du répertoire du fichier Analyse TB2023
-excel_file = r"C:\Users\LP\Desktop\Resto\Resto\Analyse TB2023.xlsx"
+excel_file = r"Analyse TB2023.xlsx"
 
 # Choisir les feuilles a sélectionnées pour le chiffre d'affaire monthly du fichier Analyse TB2023 que vous souhaitez consolider
 sheets_to_consolidate = ['AVRIL 23', 'MAI 23', 'JUIN 23', 'JUILLET 23'] 
@@ -61,7 +61,7 @@ consolidated_sheet.to_excel(consolidated_excel_file, index=False)
 ################################################### 2 #############################################################################
 
 # Ouvrir le fichier Excel "Analyse TB2023.xlsx" et charger la feuille "Détail Dépenses"
-excel_file = r"C:\Users\LP\Desktop\Resto\Resto\Analyse TB2023.xlsx"
+excel_file = r"Analyse TB2023.xlsx"
 sheet_name =  "Détail Dépenses"
 
 df = pd.read_excel(excel_file, sheet_name)
@@ -102,7 +102,7 @@ print(f"Données de la feuille '{sheet_name}' traitées et enregistrées dans '{
 ###################################################  4  #######################################################################
 
 # Charger les données de la feuille "RH" depuis le fichier Excel Analyse TB2023
-excel_file = r"C:\Users\LP\Desktop\Resto\Resto\Analyse TB2023.xlsx"
+excel_file = r"Analyse TB2023.xlsx"
 sheet_name = "RH"
 df = pd.read_excel(excel_file, sheet_name)
 
@@ -314,7 +314,7 @@ tcd["Taux marge brute"] = (tcd["Marge brute"])/(tcd["CA"])
 # Afficher le tableau croisé dynamique
 #tcd
 # Enregistrer le DataFrame filtré dans un autre fichier Excel
-new_filtered_excel_file = r"C:\Users\LP\Desktop\Resto\Resto\non.csv"
+new_filtered_excel_file = r"non.csv"
 tcd.to_csv(new_filtered_excel_file, index=True)
 
 print(f"Données consolidées et enregistrées dans '{new_filtered_excel_file}'.")
@@ -345,7 +345,7 @@ inventaire2_df = consolidated_df
 inventaire2_df.rename(columns={"Famille/Produit": "Item"}, inplace=True)
 
 # Charger le DataFrame de correspondance
-correspondances_df = pd.read_excel(r"C:\Users\LP\Desktop\Resto\Resto\correspondances.xlsx")
+correspondances_df = pd.read_excel(r"correspondances.xlsx")
 
 # Créer les nouvelles colonnes "Catégorie" et "Sous-catégorie"
 inventaire2_df["Catégorie"] = ""
