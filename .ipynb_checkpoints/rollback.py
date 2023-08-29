@@ -449,7 +449,7 @@ def generate_pie_chart_weight_on_revenue(filtered_df):
         labels=df_category_revenue['Catégorie'],
         values=df_category_revenue['Poids'],
         textinfo='label+percent',
-        hovertemplate='<b>%{label}</b><br>Poids : %{percent}<br>Valeur Absolue : %{customdata} FCFA',
+        hovertemplate='<b>%{label}</b><br>Poids : %{percent:.2%}<br>Valeur Absolue : %{customdata} FCFA',
         customdata=df_category_revenue['Valeur Absolue'],
         marker=dict(
             colors=['#FF5733', '#FFC300', '#36D7B7', '#3C40C6', '#27AE60', '#F39C12', '#9B59B6', '#D4AC0D', '#E74C3C', '#3498DB']
@@ -469,43 +469,15 @@ def generate_pie_chart_weight_on_revenue(filtered_df):
 
 
 def generate_treemap_item_subcategory(filtered_df, total_revenue):
+    df = filtered_df.copy()
 
     # Calculer les poids en pourcentage en utilisant le total des revenus
     df['Poids'] = df['Total HT'] / total_revenue * 100
 
-    # Arrondir les pourcentages à l'entier supérieur
-    df['Poids'] = df['Poids'].astype(int).ceil()
+    # Convertir les pourcentages en entiers
+    df['Poids'] = df['Poids'].astype(int)
 
     fig = px.treemap(df, path=['Catégorie', 'Sous-catégorie', 'Item'],
-                     values='Poids',  # Utilisation des poids calculés
-                     color='Item',
-                     labels={'Poids': 'Poids (%)'})  # Définir le label pour la colonne 'Poids'
-
-    fig.update_layout()
-
-    fig.update_traces(
-        hovertemplate='<b>%{label}</b><br>Poids: %{value:.0f}%',  # Format sans décimales
-        textinfo='label+percent entry',  # Affiche le label de la catégorie et le pourcentage
-        textposition='middle center'  # Centre l'affichage du texte
-    )
-
-    return fig
-
-
-
-
-
-#########    2 b   ########
-#def generate_treemap_item_subcategory(filtered_df):
-
-
-def generate_treemap_subcategory(filtered_df):
-    df = filtered_df.copy()
-    total_revenue = df['Total HT'].sum()
-
-    df['Poids'] = df['Total HT'] / total_revenue * 100  # Calcul du poids en pourcentage
-
-    fig = px.treemap(df, path=['Catégorie', 'Sous-catégorie'],
                      values='Poids',  # Utilisation des poids calculés
                      color='Sous-catégorie',
                      labels={'Poids': 'Poids (%)'})  # Définir le label pour la colonne 'Poids'
@@ -513,7 +485,7 @@ def generate_treemap_subcategory(filtered_df):
     fig.update_layout()
 
     fig.update_traces(
-        hovertemplate='<b>%{label}</b><br>Poids: %{value}%',  # Format avec 2 décimales
+        hovertemplate='<b>%{label}</b><br>Poids: %{value}%',  # Format sans décimales
         textinfo='label+percent entry',  # Affiche le label de la catégorie et le pourcentage
         textposition='middle center'  # Centre l'affichage du texte
     )
@@ -523,6 +495,38 @@ def generate_treemap_subcategory(filtered_df):
     )
 
     return fig
+
+
+
+
+#########    2 b   ########
+#def generate_treemap_item_subcategory(filtered_df):
+
+
+def generate_treemap_subcategory(filtered_df):
+ 
+    df = filtered_df.copy()
+    total_revenue = df['Total HT'].sum()
+
+    df['Poids'] = (df['Total HT'] / total_revenue * 100).astype(int)  # Calcul des pourcentages et conversion en entiers
+
+    fig = px.treemap(df, path=['Catégorie', 'Sous-catégorie'],
+                     values='Poids',  # Utilisation des poids calculés
+                     color='Sous-catégorie',
+                     labels={'Poids': 'Poids (%)'})  # Définir le label pour la colonne 'Poids'
+
+    fig.update_layout()
+
+    fig.update_traces(
+        hovertemplate='<b>%{label}</b><br>Poids: %{value}%',  # Format sans décimales
+        textinfo='label+text+value',  # Affiche le label de la catégorie et le pourcentage sans décimales
+        texttemplate='%{label}<br>Poids: %{value}%'
+    )
+
+    return fig
+
+
+
 
 
 
