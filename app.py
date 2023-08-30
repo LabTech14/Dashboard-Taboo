@@ -1086,8 +1086,8 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
         ], className="row")
 
 
-if __name__ == '__main__':
-    app.run_server(debug=True, port=5519)
+#if __name__ == '__main__':
+    #app.run_server(debug=True, port=5519)
 
 # Récupére le port attribué par Heroku depuis la variable d'environnement
 port = int(os.environ.get('PORT', 8050))  
