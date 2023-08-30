@@ -690,6 +690,9 @@ def generate_(filtered_df):
                 showlegend=False
             ))
 
+
+ #######################################################################################################################################           
+
     # Personnalisation du titre et des axes
     fig.update_layout(title_text='',
                       title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Montant / Pourcentage')
