@@ -436,8 +436,6 @@ sous_categorie_list = df['Sous-catégorie'].unique()
 
 # Fonctions pour générer les visualisations des KPIs
 
-#########    1   ########
-
 def generate_pie_chart_weight_on_revenue(filtered_df):
     df_category_revenue = filtered_df.groupby('Catégorie')['Total HT'].sum().reset_index()
     total_revenue = df_category_revenue['Total HT'].sum()
@@ -463,14 +461,21 @@ def generate_pie_chart_weight_on_revenue(filtered_df):
         pull=explode  # Appliquer la fonction d'explosion
     ))
 
-    fig.update_layout()
+    fig.update_layout(
+        legend=dict(
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Ajuste la position horizontale
+        )
+    )
 
     return fig
 
 
 #########    2    ########
 #def generate_treemap_item_subcategory(filtered_df):
-import plotly.express as px
 
 def generate_treemap_item_subcategory(filtered_df):
     df = filtered_df.copy()
@@ -545,6 +550,16 @@ def generate_sunburst_item_category(filtered_df):
     # Personnalisation du titre et des axes
     fig.update_layout(title_text='',
                       title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Chiffre d\'affaires'.upper(), yaxis2_title='Taux de marge brute'.upper())
+    # Placer la légende en dessous du graphique
+    fig.update_layout(
+        legend=dict(
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
 
     return fig
     
@@ -567,16 +582,23 @@ def generate_sunburst_subcategory_within_category(filtered_df):
     # Mettre la légende en majuscules
     for legend_item in fig.data:
         legend_item.name = legend_item.name.upper()
-    #fig.update_layout( )
-    return fig
+   # Placer la légende en dessous du graphique
+    fig.update_layout(
+        legend=dict(
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
 
+    return fig
 
 #########    5    ########
 def generate_bar_weight_on_revenue(filtered_df):
 
-    
     fina['Profitabilité'] = fina['Resultat net'] / fina['CA']
-    #fina['Taux marge brute'] = (fina['Marge brute'] / fina['CA']) * 100
 
     colors = px.colors.qualitative.Set1  # Changer Set1 à une autre palette de couleurs si désiré
 
@@ -596,6 +618,21 @@ def generate_bar_weight_on_revenue(filtered_df):
     fig.update_layout(title_text='',
                       title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Profitabilité'.upper(), yaxis2_title='Taux marge brute'.upper())
 
+    # Mettre la légende en majuscules
+    for legend_item in fig.data:
+        legend_item.name = legend_item.name.upper()
+
+    # Placer la légende en dessous du graphique
+    fig.update_layout(
+        legend=dict(
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
     return fig
     
    
@@ -604,7 +641,6 @@ def generate_bar_weight_on_revenue(filtered_df):
  #########   6   ########
 
 def generate_box(filtered_df):
-    
     
     fig = go.Figure()
 
@@ -632,12 +668,23 @@ def generate_box(filtered_df):
     fig.update_layout(title_text='',#Coûts des produits vendus et Marge brute
                       title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Montant / Pourcentage'.upper())
 
+    # Placer la légende en dessous du graphique
+    fig.update_layout(
+        legend=dict(
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
     return fig
 
 
 #########    7    ########
 def generate(filtered_df):
-    
+
     fig = go.Figure()
 
     # Ajouter une trace de barres empilées pour le chiffre d'affaires et le coût des produits vendus
@@ -645,11 +692,24 @@ def generate(filtered_df):
     fig.add_trace(go.Bar(x=fina['Mois'], y=fina['CA'], name='Chiffre d\'affaires'.upper()))
 
     # Personnalisation du titre et des axes
-    fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Montant'.upper())
-#Chiffre d\'affaires vs Coûts des produits vendus
+    fig.update_layout(title_text='',  # Titre du graphique
+                      title_x=0.5,  # Position du titre
+                      xaxis_title='Mois'.upper(),  # Titre de l'axe des x
+                      yaxis_title='Montant'.upper())  # Titre de l'axe des y
+
     # Empiler les barres
     fig.update_layout(barmode='stack')
+
+    # Placer la légende en dessous du graphique
+    fig.update_layout(
+        legend=dict(
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
 
     return fig
 
@@ -690,12 +750,19 @@ def generate_(filtered_df):
                 showlegend=False
             ))
 
-
- #######################################################################################################################################           
-
     # Personnalisation du titre et des axes
-    fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Montant / Pourcentage')
+    fig.update_layout(title_text='', title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Montant / Pourcentage')
+
+    # Placer la légende en dessous du graphique
+    fig.update_layout(
+        legend=dict(
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
 
     return fig
 
@@ -712,6 +779,7 @@ def total_revenue(filtered_df):
         bargap=0.1,  # Espacement entre les groupes de barres
         xaxis=dict(title='Mois'.upper()),
         yaxis=dict(title='Montant'.upper()),
+        legend=dict(orientation="h"),  # Placer la légende en dessous
         legend_title='Catégorie'.upper()
     )
 
@@ -723,14 +791,17 @@ def total_revenue(filtered_df):
 ################################################ 10 #################################################################
 
 def create_stacked_bar_chart(filtered_df):
+   
     fig = px.bar(fina, x="Mois", y=["Taux DRINKS", "Taux EATS", "Taux SMOKE", "Profitabilité"],
                  title="",#Taux DRINKS, EATS, SMOKE et Profitabilité
                  labels={"value": "Taux / Montant", "variable": "Type"},
                  color_discrete_map={"Taux DRINKS": "blue", "Taux EATS": "green", "Taux SMOKE": "red", "Profitabilité": "purple"},
                  barmode="relative")  # Utilisation de barmode "relative" pour empiler les taux
 
-    fig.update_layout(legend=dict(x=1, y=1),
+    fig.update_layout(legend=dict(orientation="h"),#, yanchor="bottom", y=1.02, xanchor="right", x=1),
                       xaxis_title="Mois".upper(),
+                      #xaxis=dict(title='',  # Titre de l'axe des x vide (car la légende est dans le titre)
+                      #title_standoff=80),  # Augmenter l'espace entre le titre et l'axe des x
                       yaxis_title="Taux / Montant".upper())
 
     # Mettre la légende en majuscules
@@ -738,8 +809,8 @@ def create_stacked_bar_chart(filtered_df):
         legend_item.name = legend_item.name.upper()
 
     return fig
-
 ################################################ end #################################################################
+
 
 # Création du tableau de bord
 app = dash.Dash(__name__)
