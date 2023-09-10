@@ -26,7 +26,18 @@ warnings.filterwarnings("ignore")
 
 # Chemin du répertoire contenant les fichiers Excel
 input_directory = r'input'
-fina = pd.read_csv(r'non.csv')
+#fina = pd.read_csv(r'non.csv')
+#fina = pd.read_csv(r'non.csv', encoding='utf-8', errors='replace')
+
+
+
+# Essayer de lire le fichier CSV en utilisant utf-8
+try:
+    fina = pd.read_csv('non.csv', encoding='utf-8')
+except UnicodeDecodeError:
+    # En cas d'erreur d'encodage, essayez en utilisant latin-1
+    fina = pd.read_csv('non.csv', encoding='latin-1')
+
 
 
 ############################################## exploration et traitements des données #####################################
@@ -35,7 +46,7 @@ fina = pd.read_csv(r'non.csv')
 excel_file = r"Analyse TB2023.xlsx"
 
 # Choisir les feuilles a sélectionnées pour le chiffre d'affaire monthly du fichier Analyse TB2023 que vous souhaitez consolider
-sheets_to_consolidate = ['AVRIL 23', 'MAI 23', 'JUIN 23', 'JUILLET 23'] 
+sheets_to_consolidate = ['AVRIL 23', 'MAI 23', 'JUIN 23', 'JUILLET 23','AOUT 23'] 
 
 # Charger les feuilles spécifiées en un dictionnaire de DataFrames
 dfs = pd.read_excel(excel_file, sheet_name=sheets_to_consolidate)
@@ -434,7 +445,9 @@ categorie_list = df['Catégorie'].unique()
 # Obtenir la liste des années uniques dans la colonne 'Année'
 sous_categorie_list = df['Sous-catégorie'].unique()
 
-# Fonctions pour générer les visualisations des KPIs
+
+#################################################################################################################################################
+########################################### Fonctions pour générer les visualisations des KPIs ##################################################
 
 def generate_pie_chart_weight_on_revenue(filtered_df):
     df_category_revenue = filtered_df.groupby('Catégorie')['Total HT'].sum().reset_index()
