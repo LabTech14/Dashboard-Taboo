@@ -433,7 +433,9 @@ inventaire2_df.to_excel(output_path, index=False)
 df = inventaire2_df    #pd.read_excel(file_path)
 
 # Obtenir la liste des mois uniques dans la colonne 'Mois'
-mois_list = df['Mois'].unique()
+#mois_list = df['Mois'].unique()
+mois_list = sorted(df['Mois'].unique())
+
 
 # Obtenir la liste des années uniques dans la colonne 'Année'
 #annee_list = df['Années'].unique()
