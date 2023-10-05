@@ -39,7 +39,6 @@ except UnicodeDecodeError:
     fina = pd.read_csv('non.csv', encoding='latin-1')
 
 
-
 ############################################## exploration et traitements des données #####################################
 
 # Chemin du répertoire du fichier Analyse TB2023
