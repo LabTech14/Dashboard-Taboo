@@ -435,16 +435,16 @@ df = inventaire2_df    #pd.read_excel(file_path)
 
 # Obtenir la liste des mois uniques dans la colonne 'Mois'
 #mois_list = df['Mois'].unique()
-mois_list = sorted(df['Mois'].unique())
-#mois_list = sorted(df['Mois'].unique(), key=lambda x: datetime.datetime.strptime(x, "%B").month)
-# Créez une liste ordonnée des noms de mois en français
-#mois_ordre = [
-    #"Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
-    #"Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
-#]
+#mois_list = sorted(df['Mois'].unique())
+# Créez un dictionnaire de correspondance entre les noms de mois et les numéros de mois
+mois_numeros = {
+    'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5, 'Juin': 6,
+    'Juillet': 7, 'Août': 8, 'Septembre': 9, 'Octobre': 10, 'Novembre': 11, 'Décembre': 12
+}
 
-# Triez les mois en fonction de leur position dans la liste mois_ordre
-#mois_list = sorted(df['Mois'].unique(), key=lambda x: mois_ordre.index(x.lower()))
+# Triez les mois en fonction de leur numéro de mois
+mois_list = sorted(df['Mois'].unique(), key=lambda x: mois_numeros.get(x.lower(), 0))
+
 
 
 # Obtenir la liste des années uniques dans la colonne 'Année'
