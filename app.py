@@ -436,7 +436,9 @@ df = inventaire2_df    #pd.read_excel(file_path)
 mois_list = df['Mois'].unique()
 
 # Obtenir la liste des années uniques dans la colonne 'Année'
-annee_list = df['Années'].unique()
+#annee_list = df['Années'].unique()
+annee_list = df['Années'].astype(int).unique()
+
 
 # Obtenir la liste des années uniques dans la colonne 'Année'
 categorie_list = df['Catégorie'].unique()
