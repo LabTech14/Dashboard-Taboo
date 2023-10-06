@@ -337,6 +337,7 @@ print(f"Données consolidées et enregistrées dans '{new_filtered_excel_file}'.
 # Liste pour stocker les DataFrames de chaque fichier
 data_frames = []
 
+
 # Parcourir tous les fichiers Excel dans le répertoire
 for filename in os.listdir(input_directory):
     if filename.endswith('.xlsx') and not filename.startswith('~$'):
@@ -435,15 +436,15 @@ df = inventaire2_df    #pd.read_excel(file_path)
 
 # Obtenir la liste des mois uniques dans la colonne 'Mois'
 #mois_list = df['Mois'].unique()
-#mois_list = sorted(df['Mois'].unique())
+mois_list = sorted(df['Mois'].unique())
 # Créez un dictionnaire de correspondance entre les noms de mois et les numéros de mois
-mois_numeros = {
-    'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5, 'Juin': 6,
-    'Juillet': 7, 'Août': 8, 'Septembre': 9, 'Octobre': 10, 'Novembre': 11, 'Décembre': 12
-}
+#mois_numeros = {
+    #'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5, 'Juin': 6,
+    #'Juillet': 7, 'Août': 8, 'Septembre': 9, 'Octobre': 10, 'Novembre': 11, 'Décembre': 12
+#}
 
 # Triez les mois en fonction de leur numéro de mois
-mois_list = sorted(df['Mois'].unique(), key=lambda x: mois_numeros.get(x.lower(), 0))
+#mois_list = sorted(df['Mois'].unique(), key=lambda x: mois_numeros.get(x.lower(), 0))
 
 
 
