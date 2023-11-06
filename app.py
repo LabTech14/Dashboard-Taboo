@@ -559,7 +559,6 @@ def generate_treemap_subcategory(filtered_df):
     return fig
 
 
-
 #########    3    ########
 
 def generate_sunburst_item_category(filtered_df):
@@ -661,8 +660,7 @@ def generate_bar_weight_on_revenue(filtered_df):
     )
 
     return fig
-    
-   
+     
 
 
  #########   6   ########
