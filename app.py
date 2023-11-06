@@ -678,7 +678,7 @@ def generate_box(filtered_df):
         bar_trace = go.Bar(x=fina['Mois'], y=fina[category], name=f'{category}'.upper())
         fig.add_trace(bar_trace)
         
-
+        
 
         for i, value in enumerate(relative_values):
             bar_trace.hoverinfo = 'y+text'
