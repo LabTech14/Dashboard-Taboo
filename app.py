@@ -30,7 +30,6 @@ input_directory = r'input'
 #fina = pd.read_csv(r'non.csv', encoding='utf-8', errors='replace')
 
 
-
 # Essayer de lire le fichier CSV en utilisant utf-8
 try:
     fina = pd.read_csv('non.csv', encoding='utf-8')
