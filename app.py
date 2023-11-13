@@ -631,7 +631,7 @@ def generate_bar_weight_on_revenue(filtered_df):
     fig = go.Figure()
 
     # Ajouter une trace de barres pour la Profitabilité
-    fig.add_trace(go.Bar(x=fina['Mois'], y=fina['Profitabilité'], name='Profitabilité'.upper(), marker_color=colors[0]))
+    fig.add_trace(go.Bar(x=fina['Mois'], y=fina['Profitabilité'], name='Rentabilité'.upper(), marker_color=colors[0]))
 
     # Ajouter une trace de ligne pour le Taux marge brute avec un axe y secondaire
     fig.add_trace(go.Scatter(x=fina['Mois'], y=fina['Taux marge brute'], mode='lines', yaxis='y2',
@@ -642,7 +642,7 @@ def generate_bar_weight_on_revenue(filtered_df):
 
     # Personnalisation du titre et des axes
     fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Profitabilité'.upper(), yaxis2_title='Taux marge brute'.upper())
+                      title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Rentabilité'.upper(), yaxis2_title='Taux marge brute'.upper())
 
     # Mettre la légende en majuscules
     for legend_item in fig.data:
@@ -844,6 +844,9 @@ import plotly.graph_objects as go
 def generate_bar_chart_revenue_by_month(df):
     df_monthly_revenue = df.groupby(['Mois', 'Catégorie'])['Total HT'].sum().reset_index()
 
+    # Définir l'ordre des mois
+    ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+
     fig = go.Figure()
 
     categories = df_monthly_revenue['Catégorie'].unique()
@@ -851,6 +854,10 @@ def generate_bar_chart_revenue_by_month(df):
 
     for category, color in zip(categories, colors):
         category_data = df_monthly_revenue[df_monthly_revenue['Catégorie'] == category]
+        # Utiliser l'ordre des mois
+        category_data['Mois'] = pd.Categorical(category_data['Mois'], categories=ordered_months, ordered=True)
+        category_data = category_data.sort_values('Mois')
+        
         fig.add_trace(go.Bar(
             x=category_data['Mois'],
             y=category_data['Total HT'],
@@ -873,6 +880,7 @@ def generate_bar_chart_revenue_by_month(df):
     )
 
     return fig
+
 
 # Copie de BD dans dif
 dif = inventaire2_df.copy()
@@ -1160,7 +1168,7 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
             html.Div([
                 html.Div([
                     html.Div([
-                        html.H3("Répartition de charges par catégorie".upper(), 
+                        html.H3("Répartition des charges par catégorie".upper(), 
                                 className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
                     ], className="card-header"),
                     html.Div([
@@ -1188,7 +1196,7 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
             html.Div([
                 html.Div([
                     html.Div([
-                        html.H3("Rentabilité des ventes".upper(), 
+                        html.H3("Chiffre d'affaires et coût des produits vendus".upper(), 
                                 className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
                     ], className="card-header"),
                     html.Div([
@@ -1202,7 +1210,7 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
        html.Div([
             html.Div([
                 html.Div([
-                    html.H3("Profitabilite des ventes".upper(), 
+                    html.H3("Marge brute et Rentabilité".upper(), 
                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
                 ], className="card-header"),
                 html.Div([
