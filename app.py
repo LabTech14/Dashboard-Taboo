@@ -44,7 +44,7 @@ except UnicodeDecodeError:
 excel_file = r"Analyse TB2023.xlsx"
 
 # Choisir les feuilles a sélectionnées pour le chiffre d'affaire monthly du fichier Analyse TB2023 que vous souhaitez consolider
-sheets_to_consolidate = ['JUIN 23', 'JUILLET 23','AOUT 23','SEPTEMBRE 23','OCTOBRE 23','NOVEMBRE 23'] #'AVRIL 23', 'MAI 23', 
+sheets_to_consolidate = ['AVRIL 23', 'MAI 23','JUIN 23', 'JUILLET 23','AOUT 23','SEPTEMBRE 23','OCTOBRE 23'] #'AVRIL 23', 'MAI 23', 
 
 # Charger les feuilles spécifiées en un dictionnaire de DataFrames
 dfs = pd.read_excel(excel_file, sheet_name=sheets_to_consolidate)
