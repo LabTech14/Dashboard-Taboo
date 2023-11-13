@@ -837,6 +837,46 @@ def create_stacked_bar_chart(filtered_df):
         legend_item.name = legend_item.name.upper()
 
     return fig
+
+################################################## Autre ##############################################################
+import plotly.graph_objects as go
+
+def generate_bar_chart_revenue_by_month(df):
+    df_monthly_revenue = df.groupby(['Mois', 'Catégorie'])['Total HT'].sum().reset_index()
+
+    fig = go.Figure()
+
+    categories = df_monthly_revenue['Catégorie'].unique()
+    colors = ['#FF5733', '#FFC300', '#36D7B7', '#3C40C6', '#27AE60', '#F39C12', '#9B59B6', '#D4AC0D', '#E74C3C', '#3498DB']
+
+    for category, color in zip(categories, colors):
+        category_data = df_monthly_revenue[df_monthly_revenue['Catégorie'] == category]
+        fig.add_trace(go.Bar(
+            x=category_data['Mois'],
+            y=category_data['Total HT'],
+            name=category,
+            marker=dict(color=color)
+        ))
+
+    fig.update_layout(
+        barmode='stack',
+        xaxis=dict(title='Mois'),
+        yaxis=dict(title='Total HT'),
+        legend=dict(
+            orientation='h',
+            yanchor='bottom',
+            y=1.02,
+            xanchor='right',
+            x=1
+        ),
+        #title='Chiffre d\'affaires mensuel par catégorie',
+    )
+
+    return fig
+
+# Copie de BD dans dif
+dif = inventaire2_df.copy()
+
 ################################################ end #################################################################
 
 
@@ -1012,6 +1052,7 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
     
     # Utilisation des différentes fonctions de génération de graphiques
     fig_pie_chart_weight_on_revenue = generate_pie_chart_weight_on_revenue(filtered_df)
+    fig0 = generate_bar_chart_revenue_by_month(dif)
     fig_treemap_item_subcategory = generate_treemap_item_subcategory(filtered_df)
     fig_sunburst_item_category = generate_sunburst_item_category(filtered_df)
     fig_sunburst_subcategory_within_category = generate_sunburst_subcategory_within_category(filtered_df)
@@ -1022,6 +1063,7 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
     fig_total_revenu =  total_revenue(filtered_df)
     fig_total = generate_treemap_subcategory(filtered_df)
     fig = create_stacked_bar_chart(filtered_df)
+    
 
     return html.Div([
                 html.Div([
@@ -1038,6 +1080,24 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
                         ], className="card-body")
                     ], className="card card-primary card-outline")
                 ], className="col-md-6"),
+
+
+                
+                html.Div([
+                    html.Div([
+                        html.Div([
+                            html.H3("Chiffre d\'affaires mensuel par catégorie".upper(),
+                                    className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                        ], className="card-header"),
+                        html.Div([
+                            html.Div([
+                                html.Div(dcc.Graph(figure=fig0.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                            ], className="card-body pad table-responsive p-0")
+                        ], className="card-body")
+                    ], className="card card-primary card-outline")
+                ], className="col-md-6"),
+
+                
 
 
 
@@ -1100,7 +1160,7 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
             html.Div([
                 html.Div([
                     html.Div([
-                        html.H3("Répartition du chiffres d'affaires".upper(), 
+                        html.H3("Répartition de charges par catégorie".upper(), 
                                 className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
                     ], className="card-header"),
                     html.Div([
@@ -1151,7 +1211,7 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
                     ], className="card-body pad table-responsive p-0")
                 ], className="card-body")
             ], className="card card-primary card-outline")
-        ], className="col-md-4"),
+        ], className="col-md-6"),
 
          html.Div([
             html.Div([
@@ -1165,7 +1225,7 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
                     ], className="card-body pad table-responsive p-0")
                 ], className="card-body")
             ], className="card card-primary card-outline")
-        ], className="col-md-4"),
+        ], className="col-md-6"),
 
 
          html.Div([
@@ -1180,7 +1240,8 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
                     ], className="card-body pad table-responsive p-0")
                 ], className="card-body")
             ], className="card card-primary card-outline")
-        ], className="col-md-4"),
+        ], className="col-md-6"),
+
 
         ], className="row")
 
