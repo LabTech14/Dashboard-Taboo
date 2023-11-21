@@ -13,6 +13,9 @@ import plotly.graph_objects as go
 import plotly.express as px
 import datetime
 from decimal import Decimal
+from pathlib import Path
+import locale
+from calendar import month_name
 
 import plotly.io as pio
 pio.renderers.default = "browser"  # Utiliser le rendu dans le navigateur
@@ -461,8 +464,277 @@ sous_categorie_list = df['Sous-catégorie'].unique()
 
 
 #################################################################################################################################################
-########################################### Fonctions pour générer les visualisations des KPIs ##################################################
 
+################################################## Analyse Catégorielle ##################################################################
+#from pathlib import Path
+
+# Chemin complet vers le fichier source
+file_path = Path("inputcons\BD.xlsx")#r"BD.xlsx"
+
+# Lire les données du fichier Excel dans un DataFrame pandas
+dif = pd.read_excel(file_path)
+
+# Grouper les données par 'Mois', 'Années', et 'Catégorie', et calculer la somme du 'Total HT' pour chaque groupe
+grouped_d = dif.groupby(['Mois', 'Années', 'Catégorie'])['Total HT'].sum().reset_index()
+
+# Renommer la colonne 'Total HT' en 'CA'
+grouped_d = grouped_d.rename(columns={'Total HT': 'CA'})
+
+# Filtrer les données pour obtenir les chiffres d'affaires pour les catégories 'EAT', 'SMOKE', et 'DRINK'
+filtered_dif = grouped_d[grouped_d['Catégorie'].isin(['EAT', 'SMOKE', 'DRINK'])]
+
+# Chemin du répertoire de sortie
+output_directory = r"inputcons"
+
+# Vérifiez si le répertoire existe, sinon créez-le
+if not os.path.exists(output_directory):
+    os.makedirs(output_directory)
+
+# Nom du fichier de sortie Excel
+output_file = 'categoriel.xlsx'
+
+# Chemin complet du fichier de sortie
+output_path = os.path.join(output_directory, output_file)
+
+# Enregistrer le DataFrame filtré dans un fichier Excel
+filtered_dif.to_excel(output_path, index=False)
+
+print(f"Le fichier a été enregistré avec succès sous : {output_path}")
+
+
+
+#################################################""""""""""""""############################################################
+
+# Chemin du fichier original (remplacez par votre chemin réel)
+chemin_original = Path("Analyse_Globale.xlsx")
+
+# Faire une copie du fichier pour travailler dessus (remplacez par votre chemin réel)
+chemin_copie = chemin_original.with_name("Analyse_Globale.xlsx")
+
+# Lire les données depuis la copie
+dif = pd.read_excel(chemin_copie)
+
+# Création des nouvelles colonnes pour les catégories combinées
+dif['DRINKS'] = dif[['DRINK', 'MIAMI 228 ', 'PICASSO', 'GLACONS']].sum(axis=1)
+dif['EATS'] = dif['EAT'] + dif['GAZ']
+dif['SMOKE'] = dif['SMOKE']
+dif['CACHETS_EAT'] = dif['CACHETS']*(40/100)
+dif['CACHETS_DRINK'] = dif['CACHETS']*(40/100)
+dif['CACHETS_SMOKE'] = dif['CACHETS']**(20/100) 
+
+
+# Extraction du mois et de l'année à partir de la colonne 'Date '
+dif['Mois'] = pd.to_datetime(dif['Date ']).dt.strftime('%B')
+dif['Années'] = pd.to_datetime(dif['Date ']).dt.year
+dif = dif
+# Traduire les mois en français
+months_translation = {
+    'January': 'Janvier', 'February': 'Février', 'March': 'Mars',
+    'April': 'Avril', 'May': 'Mai', 'June': 'Juin',
+    'July': 'Juillet', 'August': 'Août', 'September': 'Septembre',
+    'October': 'Octobre', 'November': 'Novembre', 'December': 'Décembre'
+}
+dif['Mois'] = dif['Mois'].map(months_translation)
+
+# Grouper par 'Mois' et 'Années' et sommer pour chaque catégorie
+df_group = dif.groupby(['Mois', 'Années']).agg({
+    'DRINKS': 'sum',
+    'EATS': 'sum',
+    'SMOKE': 'sum',
+    #'CACHETS_SMOKE': 'sum',
+    #'CACHETS_DRINK': 'sum',
+   # 'CACHETS_EAT': 'sum'
+    
+}).reset_index()
+
+# Renommage des colonnes pour correspondre à l'aperçu fourni
+df_group.rename(columns={
+    'DRINKS': 'Coûts par catégories DRINKS',
+    'EATS': 'Coûts par catégories EATS',
+    'SMOKE': 'Coûts par catégories SMOKE'
+}, inplace=True)
+
+# Fusionner les lignes pour chaque mois en une seule ligne par mois
+df_final = df_group.melt(id_vars=['Mois', 'Années'], var_name='Catégories_Coûts', value_name='Coût des produits vendus')
+
+# Ajouter une colonne 'Catégorie' en fonction de 'Catégories_Coûts'
+category_mapping = {
+    'Coûts par catégories DRINKS': 'DRINK',
+    'Coûts par catégories EATS': 'EAT',
+    'Coûts par catégories SMOKE': 'SMOKE'
+}
+df_final['Catégorie'] = df_final['Catégories_Coûts'].map(category_mapping)
+
+# Supprimer la colonne 'Catégories_Coûts'
+df_final.drop('Catégories_Coûts', axis=1, inplace=True)
+
+# Triez par mois et années pour l'ordre chronologique
+df_final.sort_values(by=['Années', 'Mois'], inplace=True)
+
+# Préparation du chemin de sortie
+output_directory = Path("inputcons")
+output_directory.mkdir(exist_ok=True)
+output_file_name = 'Recap_Categories.xlsx'
+output_file_path = output_directory / output_file_name
+
+# Sauvegarder le résultat dans un nouveau fichier Excel
+df_final.to_excel(output_file_path, index=False)
+
+print(f"Le récapitulatif a été sauvegardé à {output_file_path}")
+
+#################################################""""""""""""""############################################################
+# Remplacer par les chemins réels de vos fichiers
+chemin_recap = "inputcons/Recap_Categories.xlsx"
+chemin_categoriel = "inputcons/categoriel.xlsx"
+
+# Charger les fichiers dans des DataFrames
+df_recap = pd.read_excel(chemin_recap)
+df_categoriel = pd.read_excel(chemin_categoriel)
+
+# Fusionner les DataFrames sur les colonnes 'Mois', 'Années' et 'Catégorie'
+df_merged12 = pd.merge(df_recap, df_categoriel, on=['Mois', 'Années', 'Catégorie'])
+
+# Sauvegarder le résultat de la fusion dans un nouveau fichier Excel
+chemin_resultat = "inputcons/Resultat_Fusion.xlsx"
+df_merged12.to_excel(chemin_resultat, index=False)
+
+#################################################""""""""""""""############################################################
+
+
+# Définir la locale en français pour les noms des mois
+locale.setlocale(locale.LC_TIME, 'fr_FR')
+
+# Chemin vers le fichier original et le répertoire de destination
+original_file_path = Path("DétailsDépenses.xlsx")
+destination_directory = Path("inputcons")
+
+# Faire une copie du fichier
+copied_file_path = destination_directory / original_file_path.name
+if not destination_directory.exists():
+    destination_directory.mkdir(parents=True)
+atch = pd.read_excel(original_file_path)
+atch.to_excel(copied_file_path, index=False)
+
+# Lire les données du fichier copié
+atch = pd.read_excel(copied_file_path)
+
+# Création des nouvelles colonnes basées sur les pourcentages fournis
+categories = ['EAT', 'DRINK', 'SMOKE']
+allocations = {'CACHETS': [0.4, 0.4, 0.2], 'CASH POWER': [0.4, 0.4, 0.2], 'RH': [0.4, 0.4, 0.2]}
+other_columns = ['MONNAIE', 'CREDIT TEL', 'INTERNET / TV', 'LOYERS', 'ENTRETIEN ', 'TRANSPORT', 'AUTRE']
+marketing_admin_columns = ['MARKETING', 'ADMINISTRATIF']
+
+# Calcul des allocations pour les colonnes 'Autres' et 'MARKETING_ADMIN'
+atch['Autres'] = atch[other_columns].sum(axis=1)
+atch['MARKETING_ADMIN'] = atch[marketing_admin_columns].sum(axis=1)
+allocations['Autres'] = [0.4, 0.4, 0.2]
+allocations['MARKETING_ADMIN'] = [0.4, 0.4, 0.2]
+
+# Calcul des colonnes par catégorie
+for alloc in allocations:
+    for i, cat in enumerate(categories):
+        atch[f'{alloc}_{cat}'] = atch[alloc] * allocations[alloc][i]
+
+# Convertir les dates en mois et années séparés
+atch['Mois'] = pd.to_datetime(atch['Date ']).dt.month.apply(lambda x: month_name[x].capitalize())
+atch['Année'] = pd.to_datetime(atch['Date ']).dt.year
+
+# Maintenant, créons le DataFrame final avec les lignes pour chaque catégorie
+final_rows = []
+for i, row in atch.iterrows():
+    for cat in categories:
+        new_row = {
+            'Année': row['Année'],
+            'Mois': row['Mois'],
+            'MARKETING_ADMIN': row[f'MARKETING_ADMIN_{cat}'],
+            'CACHETS': row[f'CACHETS_{cat}'],
+            'CASH POWER': row[f'CASH POWER_{cat}'],
+            'Autres': row[f'Autres_{cat}'],
+            'RH': row[f'RH_{cat}'],
+            'Opex': row[f'MARKETING_ADMIN_{cat}'] + row[f'CACHETS_{cat}'] + row[f'CASH POWER_{cat}'] + row[f'Autres_{cat}'] + row[f'RH_{cat}'],
+            'Catégorie': cat
+        }
+        final_rows.append(new_row)
+
+# Transformer en DataFrame
+final_dfu = pd.DataFrame(final_rows)
+
+# Effectuer un groupby sur 'Année', 'Mois' et 'Catégorie'
+grouped_dfu = final_dfu.groupby(['Année', 'Mois', 'Catégorie']).sum().reset_index()
+
+# Trier le DataFrame groupé par Année et Mois
+grouped_dfu.sort_values(by=['Année', 'Mois'], inplace=True)
+
+# Enregistrer le DataFrame groupé
+final_file_path = destination_directory / 'Grouped_Final_Details.xlsx'
+grouped_dfu.to_excel(final_file_path, index=False)
+
+print(f"Le fichier groupé a été enregistré avec succès sous : {final_file_path}")
+
+
+
+#################################################""""""""""""""############################################################
+
+# Chemins vers les fichiers Excel
+grouped_details_path = Path("inputcons/Grouped_Final_Details.xlsx")
+result_fusion_path = Path("inputcons/Resultat_Fusion.xlsx")
+
+# Chargement des DataFrames
+grouped_df = pd.read_excel(grouped_details_path)
+result_fusion_df = pd.read_excel(result_fusion_path)
+
+# Renommer les colonnes pour uniformiser les noms
+result_fusion_df.rename(columns={'Années': 'Année'}, inplace=True)
+
+# Assurez-vous que le format des mois est le même dans les deux DataFrames
+# Si nécessaire, mappez les noms des mois en français pour 'result_fusion_df'
+
+# Fusionner les DataFrames sur les colonnes 'Année', 'Mois', et 'Catégorie'
+combined_df = pd.merge(grouped_df, result_fusion_df, on=['Année', 'Mois', 'Catégorie'], how='outer')
+
+# Enregistrer le DataFrame combiné dans un nouveau fichier Excel
+combined_file_path = Path("inputcons/Combined_Details.xlsx")
+combined_df.to_excel(combined_file_path, index=False)
+
+print(f"Le fichier combiné a été enregistré avec succès sous : {combined_file_path}")
+
+
+#################################################""""""""""""""############################################################
+
+# Chemin vers le fichier Excel
+excel_file_path = Path("inputcons/Combined_Details.xlsx")
+
+# Lire les données du fichier Excel
+walla = pd.read_excel(excel_file_path)
+
+# Calcul de la Marge brute
+walla['Marge brute'] = walla['CA'] - walla['Coût des produits vendus']
+
+# Calcul du Résultat d'exploitation
+walla['Resultat d\'exploitation'] = walla['Marge brute'] - walla['Opex']
+
+# Calcul de la Rentabilité
+walla['Rentabilite'] = round(walla['Resultat d\'exploitation'] / walla['CA'], 1)
+
+# Calcul du Taux Coût des produits vendus
+walla['Taux Coût des produits vendus'] = round(walla['Coût des produits vendus'] / walla['CA'], 1)
+
+# Calcul du Taux Opex
+walla['Taux Opex'] = round(walla['Opex'] / walla['CA'], 1)
+
+# Calcul du Taux Marge brute
+walla['Taux Marge brute'] = round(walla['Marge brute'] / walla['CA'], 1)
+
+# Enregistrer les résultats dans le même fichier Excel
+walla.to_excel(excel_file_path, index=False)
+
+print(f"Les calculs ont été effectués avec succès et enregistrés dans {excel_file_path}")
+
+
+
+#################################################################################################################################################
+
+########################################### Fonctions pour générer les visualisations des KPIs ##################################################
 def generate_pie_chart_weight_on_revenue(filtered_df):
     df_category_revenue = filtered_df.groupby('Catégorie')['Total HT'].sum().reset_index()
     total_revenue = df_category_revenue['Total HT'].sum()
@@ -499,6 +771,7 @@ def generate_pie_chart_weight_on_revenue(filtered_df):
     )
 
     return fig
+
 
 
 #########    2    ########
@@ -565,17 +838,47 @@ def generate_sunburst_item_category(filtered_df):
     fig = go.Figure()
 
     # Ajouter une trace de barres pour le CA
-    fig.add_trace(go.Bar(x=fina['Mois'], y=fina['CA'], name='Chiffre d\'affaires'.upper()))
+    bar_trace = go.Bar(x=fina['Mois'], y=fina['CA'], name='Chiffre d\'affaires'.upper())
+    fig.add_trace(bar_trace)
 
     # Ajouter une trace de ligne pour le taux de marge brute avec un axe y secondaire
-    fig.add_trace(go.Scatter(x=fina['Mois'], y=fina['Taux marge brute'], mode='lines', yaxis='y2', name='Taux de marge brute'.upper()))
+    line_trace = go.Scatter(x=fina['Mois'], y=fina['Taux marge brute'], mode='lines', yaxis='y2', name='Taux de marge brute'.upper())
+    fig.add_trace(line_trace)
+
+    # Ajouter des étiquettes de données pour les barres du chiffre d'affaires
+    for i, value in enumerate(fina['CA']):
+        fig.add_annotation(
+            x=fina['Mois'][i],
+            y=value,
+            text=f"{value:.2f}",  # Format avec deux décimales
+            showarrow=False,
+            font=dict(size=12, color="black"),
+            yshift=10  # Ajustement vertical
+        )
+
+    # Ajouter des étiquettes de données pour la ligne de taux de marge brute
+    for i, value in enumerate(fina['Taux marge brute']):
+        fig.add_annotation(
+            x=fina['Mois'][i],
+            y=value,
+            text=f"{value:.2%}",  # Format en pourcentage
+            showarrow=False,
+            font=dict(size=12, color="red"),  # Couleur différente pour se distinguer
+            yshift=10  # Ajustement vertical
+        )
 
     # Personnalisation de l'axe y2 (axe de droite)
     fig.update_layout(yaxis2=dict(anchor='x', overlaying='y', side='right'))
 
     # Personnalisation du titre et des axes
-    fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Chiffre d\'affaires'.upper(), yaxis2_title='Taux de marge brute'.upper())
+    fig.update_layout(
+        title_text='',
+        title_x=0.5,
+        xaxis_title='Mois'.upper(),
+        yaxis_title='Chiffre d\'affaires'.upper(),
+        yaxis2_title='Taux de marge brute'.upper()
+    )
+
     # Placer la légende en dessous du graphique
     fig.update_layout(
         legend=dict(
@@ -588,29 +891,27 @@ def generate_sunburst_item_category(filtered_df):
     )
 
     return fig
-    
+
 #Chiffre d\'affaires et Taux de Marge Brute par mois
     
 #########    4   ########
 def generate_sunburst_subcategory_within_category(filtered_df):
-    
     fina_grouped = fina.groupby('Mois').sum().reset_index()
-    fig = px.line(fina_grouped, x='Mois', y=['CACHETS', 'CASH POWER', 'MARKETING_ADMIN', 'RH','CONSOMMABLES', 'Autres'],
-                  title='')#Évolution des Charges Opérationnelles
+    fig = px.bar(fina_grouped, x='Mois', y=['CACHETS', 'CASH POWER', 'MARKETING_ADMIN', 'RH','CONSOMMABLES', 'Autres'],
+                 title='')  # Évolution des Charges Opérationnelles
 
-    #fig.update_xaxes(categoryorder='category ascending')  # Ajoute cette ligne pour corriger l'ordre des mois
-   
     # Personnalisation du style du titre
     fig.update_layout(title_text='',
                       title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Chiffre d\'affaires'.upper())
 
-
     # Mettre la légende en majuscules
     for legend_item in fig.data:
         legend_item.name = legend_item.name.upper()
-   # Placer la légende en dessous du graphique
+
+    # Placer la légende en dessous du graphique sans titre
     fig.update_layout(
         legend=dict(
+            title_text='',  # Enlever le titre de la légende
             orientation="h",  # Orientation horizontale pour la légende
             yanchor="bottom",  # Ancre la légende en bas
             y=1.02,  # Ajuste la position verticale pour placer en dessous
@@ -619,11 +920,24 @@ def generate_sunburst_subcategory_within_category(filtered_df):
         )
     )
 
+    # Calculer le total par mois et ajouter des annotations
+    # (La partie suivante reste inchangée)
+    total_par_mois = fina_grouped[['CACHETS', 'CASH POWER', 'MARKETING_ADMIN', 'RH', 'CONSOMMABLES', 'Autres']].sum(axis=1)
+    for i, (x_val, y_vals) in enumerate(zip(fina_grouped['Mois'], fina_grouped[['CACHETS', 'CASH POWER', 'MARKETING_ADMIN', 'RH', 'CONSOMMABLES', 'Autres']].values)):
+        cumul_y = 0
+        for y_val, cat_name in zip(y_vals, ['CACHETS', 'CASH POWER', 'MARKETING_ADMIN', 'RH', 'CONSOMMABLES', 'Autres']):
+            percentage = y_val / total_par_mois[i] * 100
+            cumul_y += y_val / 2
+            fig.add_annotation(x=x_val, y=cumul_y,
+                               text=f"{percentage:.1f}%",
+                               showarrow=False,
+                               yshift=10)
+            cumul_y += y_val / 2
+
     return fig
 
 #########    5    ########
 def generate_bar_weight_on_revenue(filtered_df):
-
     fina['Profitabilité'] = fina['Resultat net'] / fina['CA']
 
     colors = px.colors.qualitative.Set1  # Changer Set1 à une autre palette de couleurs si désiré
@@ -631,22 +945,35 @@ def generate_bar_weight_on_revenue(filtered_df):
     fig = go.Figure()
 
     # Ajouter une trace de barres pour la Profitabilité
-    fig.add_trace(go.Bar(x=fina['Mois'], y=fina['Profitabilité'], name='Rentabilité'.upper(), marker_color=colors[0]))
+    bar_trace = go.Bar(x=fina['Mois'], y=fina['Profitabilité'], name='Rentabilité'.upper(), marker_color=colors[0])
+    fig.add_trace(bar_trace)
 
     # Ajouter une trace de ligne pour le Taux marge brute avec un axe y secondaire
-    fig.add_trace(go.Scatter(x=fina['Mois'], y=fina['Taux marge brute'], mode='lines', yaxis='y2',
-                             name='Taux marge brute'.upper(), line=dict(color=colors[1])))
+    line_trace = go.Scatter(x=fina['Mois'], y=fina['Taux marge brute'], mode='lines', yaxis='y2', name='Taux marge brute'.upper(), line=dict(color=colors[1]))
+    fig.add_trace(line_trace)
+
+    # Ajouter des étiquettes de données sur les barres
+    for i, value in enumerate(fina['Profitabilité']):
+        fig.add_annotation(
+            x=fina['Mois'][i],
+            y=value,
+            text=f"{value:.2%}",  # Format en pourcentage
+            showarrow=False,
+            font=dict(size=12, color="black"),
+            yshift=10  # Ajustement vertical pour éviter que le texte ne soit sur la barre
+        )
 
     # Personnalisation de l'axe y2 (axe de droite)
     fig.update_layout(yaxis2=dict(anchor='x', overlaying='y', side='right'))
 
     # Personnalisation du titre et des axes
-    fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Rentabilité'.upper(), yaxis2_title='Taux marge brute'.upper())
-
-    # Mettre la légende en majuscules
-    for legend_item in fig.data:
-        legend_item.name = legend_item.name.upper()
+    fig.update_layout(
+        title_text='',
+        title_x=0.5,
+        xaxis_title='Mois'.upper(),
+        yaxis_title='Rentabilité'.upper(),
+        yaxis2_title='Taux marge brute'.upper()
+    )
 
     # Placer la légende en dessous du graphique
     fig.update_layout(
@@ -660,41 +987,44 @@ def generate_bar_weight_on_revenue(filtered_df):
     )
 
     return fig
-     
+
 
 
  #########   6   ########
 
-
 def generate_box(filtered_df):
-    
     fig = go.Figure()
 
     categories = ['Coûts des produits vendus', 'Marge brute']
 
     for category in categories:
         relative_values = fina[category] / fina[categories].sum(axis=1) * 100
-        fig.add_trace(go.Scatter(x=fina['Mois'], y=fina[category], name=category.upper()))
         bar_trace = go.Bar(x=fina['Mois'], y=fina[category], name=f'{category}'.upper())
         fig.add_trace(bar_trace)
-        
 
+        # Ajout des étiquettes de pourcentage sur les barres
+        for i, value in enumerate(fina[category]):
+            percentage = relative_values[i]
+            if value != 0:  # Afficher l'étiquette seulement si la valeur n'est pas nulle
+                # Calcul de la position Y pour centrer l'étiquette
+                y_position = value / 2 if category == "Coûts des produits vendus" else fina['Coûts des produits vendus'][i] + (value / 2)
 
-        for i, value in enumerate(relative_values):
-            bar_trace.hoverinfo = 'y+text'
-            fig.add_trace(go.Scatter(
-                x=[fina['Mois'][i]],
-                y=[fina[category][i]],
-                mode='markers',
-                marker=dict(size=1),
-                text=[f"{value:.2f}%"],
-                hoverinfo='text',
-                showlegend=False
-            ))
+                fig.add_annotation(
+                    x=fina['Mois'][i],
+                    y=y_position,
+                    text=f"{percentage:.1f}%",
+                    showarrow=False,
+                    font=dict(size=12, color="black")
+                )
 
     # Personnalisation du titre et des axes
-    fig.update_layout(title_text='',#Coûts des produits vendus et Marge brute
-                      title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Montant / Pourcentage'.upper())
+    fig.update_layout(
+        title_text='',  # Coûts des produits vendus et Marge brute
+        title_x=0.5,
+        xaxis_title='Mois'.upper(),
+        yaxis_title='Montant / Pourcentage'.upper(),
+        barmode='stack'  # Mode de barres empilées
+    )
 
     # Placer la légende en dessous du graphique
     fig.update_layout(
@@ -710,14 +1040,16 @@ def generate_box(filtered_df):
     return fig
 
 
+
+
 #########    7    ########
 def generate(filtered_df):
-
     fig = go.Figure()
 
     # Ajouter une trace de barres empilées pour le chiffre d'affaires et le coût des produits vendus
-    fig.add_trace(go.Bar(x=fina['Mois'], y=fina['Coûts des produits vendus'], name='Coûts des produits vendus'.upper()))
-    fig.add_trace(go.Bar(x=fina['Mois'], y=fina['CA'], name='Chiffre d\'affaires'.upper()))
+    trace1 = go.Bar(x=fina['Mois'], y=fina['Coûts des produits vendus'], name='Coûts des produits vendus'.upper())
+    trace2 = go.Bar(x=fina['Mois'], y=fina['CA'], name='Chiffre d\'affaires'.upper())
+    fig.add_traces([trace1, trace2])
 
     # Personnalisation du titre et des axes
     fig.update_layout(title_text='',  # Titre du graphique
@@ -728,6 +1060,21 @@ def generate(filtered_df):
     # Empiler les barres
     fig.update_layout(barmode='stack')
 
+    # Ajout des étiquettes de pourcentage
+    for trace in fig.data:
+        y_values = trace.y
+        for index, value in enumerate(y_values):
+            # Calcul du pourcentage pour chaque segment de la barre
+            total = trace1.y[index] + trace2.y[index]
+            percentage = (value / total * 100) if total != 0 else 0
+            fig.add_annotation(
+                x=trace.x[index],
+                y=value/2 + (0 if trace == trace1 else trace1.y[index]),  # Positionnement au milieu du segment
+                text=f"{percentage:.1f}%",
+                showarrow=False,
+                font=dict(size=12, color="white")
+            )
+
     # Placer la légende en dessous du graphique
     fig.update_layout(
         legend=dict(
@@ -740,6 +1087,7 @@ def generate(filtered_df):
     )
 
     return fig
+
 
 #########    8   ########
 #def generate_(filtered_df):
@@ -778,6 +1126,7 @@ def generate_(filtered_df):
                 showlegend=False
             ))
 
+
     # Personnalisation du titre et des axes
     fig.update_layout(title_text='', title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Montant / Pourcentage')
 
@@ -794,13 +1143,18 @@ def generate_(filtered_df):
 
     return fig
 
-################################################ 9 #################################################################
 
+
+
+
+
+
+################################################ 9 #################################################################
 
 def total_revenue(filtered_df):
     fina_grouped = fina.groupby('Mois').sum().reset_index()
     fig = px.bar(fina_grouped, x='Mois', y=['Tresorerie net d\'exploitation', 'Tresorerie net d\'investissement'],
-                  title='')#Évolution des Flux de Trésorerie
+                 title='')  # Évolution des Flux de Trésorerie
 
     fig.update_layout(
         barmode='relative',  # Afficher les barres relatives aux valeurs positives et négatives
@@ -808,41 +1162,85 @@ def total_revenue(filtered_df):
         xaxis=dict(title='Mois'.upper()),
         yaxis=dict(title='Montant'.upper()),
         legend=dict(orientation="h"),  # Placer la légende en dessous
-        legend_title='Catégorie'.upper()
+        legend_title=''.upper()
     )
 
     # Mettre la légende en majuscules
     for legend_item in fig.data:
         legend_item.name = legend_item.name.upper()
 
+    # Ajout des étiquettes de pourcentage
+    for i, bar in enumerate(fig.data):
+        for index, value in enumerate(bar.y):
+            percentage = value / sum(bar.y) * 100 if sum(bar.y) != 0 else 0
+            fig.add_annotation(
+                x=bar.x[index],
+                y=value / 2,
+                text=f"{percentage:.1f}%",
+                showarrow=False,
+                font=dict(size=12, color="white"),
+            )
+
     return fig
+
+
 ################################################ 10 #################################################################
 
 def create_stacked_bar_chart(filtered_df):
-   
-    fig = px.bar(fina, x="Mois", y=["Taux DRINKS", "Taux EATS", "Taux SMOKE", "Profitabilité"],
-                 title="",#Taux DRINKS, EATS, SMOKE et Profitabilité
-                 labels={"value": "Taux / Montant", "variable": "Type"},
-                 color_discrete_map={"Taux DRINKS": "blue", "Taux EATS": "green", "Taux SMOKE": "red", "Profitabilité": "purple"},
+    # Calcul des pourcentages
+    fina['Taux DRINKS'] = fina['DRINKS'] / fina['CA'].replace(0, 1)
+    fina['Taux EATS'] = fina['EATS'] / fina['CA'].replace(0, 1)
+    fina['Taux SMOKE'] = fina['SMOKE'] / fina['CA'].replace(0, 1)
+    fina['Profitabilité'] = fina['Resultat net'] / fina['CA'].replace(0, 1)
+
+    # Normaliser les pourcentages pour qu'ils totalisent 100%
+    total = fina[['Taux DRINKS', 'Taux EATS', 'Taux SMOKE']].sum(axis=1)
+    fina['Taux DRINKS'] /= total
+    fina['Taux EATS'] /= total
+    fina['Taux SMOKE'] /= total
+
+    # Création du graphique
+    fig = px.bar(fina, x="Mois", y=["Taux DRINKS", "Taux EATS", "Taux SMOKE"],
+                 title="",  # Taux DRINKS, EATS, SMOKE
+                 labels={"value": "Taux", "variable": ""},
+                 color_discrete_map={"Taux DRINKS": "blue", "Taux EATS": "green", "Taux SMOKE": "red"},
                  barmode="relative")  # Utilisation de barmode "relative" pour empiler les taux
 
-    fig.update_layout(legend=dict(orientation="h"),#, yanchor="bottom", y=1.02, xanchor="right", x=1),
+    # Mise à jour de la mise en page
+    fig.update_layout(legend=dict(orientation="h"),
                       xaxis_title="Mois".upper(),
-                      #xaxis=dict(title='',  # Titre de l'axe des x vide (car la légende est dans le titre)
-                      #title_standoff=80),  # Augmenter l'espace entre le titre et l'axe des x
-                      yaxis_title="Taux / Montant".upper())
+                      yaxis_title="Taux")
 
-    # Mettre la légende en majuscules
-    for legend_item in fig.data:
-        legend_item.name = legend_item.name.upper()
+    # Ajout des annotations pour chaque barre
+    for i, (x_val, y_vals) in enumerate(zip(fina['Mois'], fina[["Taux DRINKS", "Taux EATS", "Taux SMOKE"]].values)):
+        cumul_y = 0  # Cumul des valeurs précédentes pour positionner correctement l'étiquette
+        for y_val, cat_name in zip(y_vals, ["DRINKS", "EATS", "SMOKE"]):
+            percentage = y_val * 100  # Convertir en pourcentage
+            cumul_y += y_val / 2  # Position à mi-hauteur de la barre actuelle
+            fig.add_annotation(x=x_val, y=cumul_y,
+                               text=f"{percentage:.1f}%",  # Format avec 1 décimale
+                               showarrow=False,
+                               yshift=10)  # Ajustez yshift pour positionner le texte au-dessus des barres
+            cumul_y += y_val / 2  # Ajouter la seconde moitié de la barre actuelle
+
+    # Ajout de la profitabilité comme une ligne séparée
+    fig.add_trace(go.Scatter(x=fina['Mois'], y=fina['Profitabilité'], mode='lines+markers',
+                             name='Profitabilité', yaxis='y2'))
+
+    # Mise à jour du layout pour la profitabilité
+    fig.update_layout(yaxis2=dict(title='Profitabilité', overlaying='y', side='right'))
 
     return fig
 
-################################################## Autre ##############################################################
-import plotly.graph_objects as go
 
+
+
+################################################## Autre ##############################################################
 def generate_bar_chart_revenue_by_month(df):
     df_monthly_revenue = df.groupby(['Mois', 'Catégorie'])['Total HT'].sum().reset_index()
+
+    # Calculer le pourcentage par catégorie
+    df_monthly_revenue['Poids'] = df_monthly_revenue.groupby('Mois')['Total HT'].transform(lambda x: x / x.sum() * 100)
 
     # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
@@ -858,11 +1256,16 @@ def generate_bar_chart_revenue_by_month(df):
         category_data['Mois'] = pd.Categorical(category_data['Mois'], categories=ordered_months, ordered=True)
         category_data = category_data.sort_values('Mois')
         
+        # Formater les valeurs en pourcentage sans virgule
+        formatted_values = category_data['Poids'].astype(int).astype(str) + '%'  
+
         fig.add_trace(go.Bar(
             x=category_data['Mois'],
             y=category_data['Total HT'],
             name=category,
-            marker=dict(color=color)
+            marker=dict(color=color),
+            text=formatted_values,
+            textposition='auto'
         ))
 
     fig.update_layout(
@@ -880,6 +1283,8 @@ def generate_bar_chart_revenue_by_month(df):
     )
 
     return fig
+
+
 
 
 # Copie de BD dans dif
@@ -1059,18 +1464,18 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
         ], className="col-lg-12 col-12")
     
     # Utilisation des différentes fonctions de génération de graphiques
-    fig_pie_chart_weight_on_revenue = generate_pie_chart_weight_on_revenue(filtered_df)
-    fig0 = generate_bar_chart_revenue_by_month(dif)
-    fig_treemap_item_subcategory = generate_treemap_item_subcategory(filtered_df)
-    fig_sunburst_item_category = generate_sunburst_item_category(filtered_df)
-    fig_sunburst_subcategory_within_category = generate_sunburst_subcategory_within_category(filtered_df)
-    fig_bar_weight_on_revenue = generate_bar_weight_on_revenue(filtered_df)
-    fig_box_category_revenue = generate_box(filtered_df)
-    fig_box_total_revenue = generate(filtered_df)
-    fig_box_total_revenu = generate_(filtered_df)
-    fig_total_revenu =  total_revenue(filtered_df)
-    fig_total = generate_treemap_subcategory(filtered_df)
-    fig = create_stacked_bar_chart(filtered_df)
+    fig_pie_chart_weight_on_revenue = generate_pie_chart_weight_on_revenue(filtered_df)#1
+    fig0 = generate_bar_chart_revenue_by_month(dif)#2
+    fig_treemap_item_subcategory = generate_treemap_item_subcategory(filtered_df)#3
+    fig_sunburst_item_category = generate_sunburst_item_category(filtered_df)#5
+    fig_sunburst_subcategory_within_category = generate_sunburst_subcategory_within_category(filtered_df)#6
+    fig_bar_weight_on_revenue = generate_bar_weight_on_revenue(filtered_df)#10
+    fig_box_category_revenue = generate_box(filtered_df)#8
+    fig_box_total_revenue = generate(filtered_df)#9
+    fig_box_total_revenu = generate_(filtered_df)#7
+    fig_total_revenu =  total_revenue(filtered_df)#11
+    fig_total = generate_treemap_subcategory(filtered_df)#4
+    fig = create_stacked_bar_chart(filtered_df)#12
     
 
     return html.Div([
