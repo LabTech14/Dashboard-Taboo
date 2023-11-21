@@ -602,7 +602,8 @@ df_merged12.to_excel(chemin_resultat, index=False)
 
 
 # Définir la locale en français pour les noms des mois
-locale.setlocale(locale.LC_TIME, 'fr_FR')
+#locale.setlocale(locale.LC_TIME, 'fr_FR')
+locale.setlocale(locale.LC_TIME, 'fr_FR.utf8')
 
 # Chemin vers le fichier original et le répertoire de destination
 original_file_path = Path("DétailsDépenses.xlsx")
