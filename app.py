@@ -469,7 +469,7 @@ sous_categorie_list = df['Sous-catégorie'].unique()
 #from pathlib import Path
 
 # Chemin complet vers le fichier source
-file_path = Path("inputcons\BD.xlsx")#r"BD.xlsx"
+file_path = Path("inputcons/BD.xlsx")#r"BD.xlsx"
 
 # Lire les données du fichier Excel dans un DataFrame pandas
 dif = pd.read_excel(file_path)
