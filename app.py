@@ -16,7 +16,7 @@ from decimal import Decimal
 from pathlib import Path
 import locale
 from calendar import month_name
-import pendulum
+#import pendulum
 import plotly.io as pio
 pio.renderers.default = "browser"  # Utiliser le rendu dans le navigateur
 
@@ -603,7 +603,8 @@ df_merged12.to_excel(chemin_resultat, index=False)
 # Définir la locale en français pour les noms des mois
 #locale.setlocale(locale.LC_TIME, 'fr_FR')
 #locale.setlocale(locale.LC_TIME, 'fr_FR.utf8')
-formatted_date = pendulum.now().locale('fr_FR').format('MMMM')
+#formatted_date = pendulum.now().locale('fr_FR').format('MMMM')
+
 
 # Chemin vers le fichier original et le répertoire de destination
 original_file_path = Path("DétailsDépenses.xlsx")
@@ -639,6 +640,15 @@ for alloc in allocations:
 # Convertir les dates en mois et années séparés
 atch['Mois'] = pd.to_datetime(atch['Date ']).dt.month.apply(lambda x: month_name[x].capitalize())
 atch['Année'] = pd.to_datetime(atch['Date ']).dt.year
+
+# Traduire les mois en français
+months_translation = {
+    'January': 'Janvier', 'February': 'Février', 'March': 'Mars',
+    'April': 'Avril', 'May': 'Mai', 'June': 'Juin',
+    'July': 'Juillet', 'August': 'Août', 'September': 'Septembre',
+    'October': 'Octobre', 'November': 'Novembre', 'December': 'Décembre'
+}
+atch['Mois'] = atch['Mois'].map(months_translation)
 
 # Maintenant, créons le DataFrame final avec les lignes pour chaque catégorie
 final_rows = []
@@ -1285,11 +1295,447 @@ def generate_bar_chart_revenue_by_month(df):
 
     return fig
 
+##################################################################### new graph #######################################################
+# Charger les données depuis le fichier Excel
+file_path = "inputcons/Combined_Details.xlsx"
+graph = pd.read_excel(file_path)
 
+def generate_eat_graph(graph):
+    # Filtrer les données pour la catégorie EAT
+    eat_data = graph[graph['Catégorie'] == 'EAT'].copy()  # Utiliser .copy() pour éviter le avertissement
+
+    # Définir l'ordre des mois de manière appropriée
+    ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    eat_data['Mois'] = pd.Categorical(eat_data['Mois'], categories=ordered_months, ordered=True)
+    
+    # Ordonner les données par mois
+    eat_data.sort_values('Mois', inplace=True)
+
+    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Coût des produits vendus' et 'Taux Rentabilite'
+    eat_data = pd.melt(eat_data, id_vars=['Mois'], value_vars=['Taux Coût des produits vendus', 'Rentabilite'],
+                       var_name='Taux', value_name='Valeur')
+
+    # Créer un graphique en barres empilées pour les taux
+    fig = px.bar(eat_data, x='Mois', y='Valeur', color='Taux',
+                 title='Taux Coût des produits vendus et Rentabilité pour la catégorie EAT',
+                 text='Valeur',
+                 labels={'Valeur': 'Taux'})
+
+    # Personnalisation du style du titre
+    fig.update_layout(title_text='',
+                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+
+    # Mettre la légende en majuscules
+    for legend_item in fig.data:
+        legend_item.name = legend_item.name.upper()
+
+    # Placer la légende en dessous du graphique sans titre
+    fig.update_layout(
+        legend=dict(
+            title_text='',  # Enlever le titre de la légende
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
+    # Centrer les étiquettes de données sur les parties concernées
+    fig.update_traces(textposition='inside')
+
+    return fig
+#############################################################################################################################""""""
+def generate_drink_graph(graph):
+    # Filtrer les données pour la catégorie DRINK
+    drink_data = graph[graph['Catégorie'] == 'DRINK'].copy()  # Utiliser .copy() pour éviter le avertissement
+
+    # Définir l'ordre des mois de manière appropriée
+    ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    drink_data['Mois'] = pd.Categorical(drink_data['Mois'], categories=ordered_months, ordered=True)
+    
+    # Ordonner les données par mois
+    drink_data.sort_values('Mois', inplace=True)
+
+    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Coût des produits vendus' et 'Taux Rentabilite'
+    drink_data = pd.melt(drink_data, id_vars=['Mois'], value_vars=['Taux Coût des produits vendus', 'Rentabilite'],
+                       var_name='Taux', value_name='Valeur')
+
+    # Créer un graphique en barres empilées pour les taux
+    fig = px.bar(drink_data, x='Mois', y='Valeur', color='Taux',
+                 title='Taux Coût des produits vendus et Rentabilité pour la catégorie EAT',
+                 text='Valeur',
+                 labels={'Valeur': 'Taux'})
+
+    # Personnalisation du style du titre
+    fig.update_layout(title_text='',
+                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+
+    # Mettre la légende en majuscules
+    for legend_item in fig.data:
+        legend_item.name = legend_item.name.upper()
+
+    # Placer la légende en dessous du graphique sans titre
+    fig.update_layout(
+        legend=dict(
+            title_text='',  # Enlever le titre de la légende
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
+    # Centrer les étiquettes de données sur les parties concernées
+    fig.update_traces(textposition='inside')
+
+    return fig
+
+#################################################################################################################################
+
+
+
+
+# Charger les données depuis le fichier Excel
+
+def generate_smoke_graph(graph):
+    # Filtrer les données pour la catégorie EAT
+    smoke_data = graph[graph['Catégorie'] == 'SMOKE'].copy()  # Utiliser .copy() pour éviter le avertissement
+
+    # Définir l'ordre des mois de manière appropriée
+    ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    smoke_data['Mois'] = pd.Categorical(smoke_data['Mois'], categories=ordered_months, ordered=True)
+    
+    # Ordonner les données par mois
+    smoke_data.sort_values('Mois', inplace=True)
+
+    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Coût des produits vendus' et 'Taux Rentabilite'
+    smoke_data = pd.melt(smoke_data, id_vars=['Mois'], value_vars=['Taux Coût des produits vendus', 'Rentabilite'],
+                       var_name='Taux', value_name='Valeur')
+
+    # Créer un graphique en barres empilées pour les taux
+    fig = px.bar(smoke_data, x='Mois', y='Valeur', color='Taux',
+                 title='Taux Coût des produits vendus et Rentabilité pour la catégorie EAT',
+                 text='Valeur',
+                 labels={'Valeur': 'Taux'})
+
+    # Personnalisation du style du titre
+    fig.update_layout(title_text='',
+                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+
+    # Mettre la légende en majuscules
+    for legend_item in fig.data:
+        legend_item.name = legend_item.name.upper()
+
+    # Placer la légende en dessous du graphique sans titre
+    fig.update_layout(
+        legend=dict(
+            title_text='',  # Enlever le titre de la légende
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
+    # Centrer les étiquettes de données sur les parties concernées
+    fig.update_traces(textposition='inside')
+
+    return fig
+#############################################################################################################################################
+
+def generat_eat_graph(graph):
+    # Filtrer les données pour la catégorie EAT
+    eat_data = graph[graph['Catégorie'] == 'EAT'].copy()  # Utiliser .copy() pour éviter le avertissement
+
+    # Définir l'ordre des mois de manière appropriée
+    ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    eat_data['Mois'] = pd.Categorical(eat_data['Mois'], categories=ordered_months, ordered=True)
+    
+    # Ordonner les données par mois
+    eat_data.sort_values('Mois', inplace=True)
+
+    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Marge brute' et 'Taux Rentabilite'
+    eat_data = pd.melt(eat_data, id_vars=['Mois'], value_vars=['Taux Marge brute', 'Rentabilite'],
+                       var_name='Taux', value_name='Valeur')
+
+    # Créer un graphique en barres empilées pour les taux
+    fig = px.bar(eat_data, x='Mois', y='Valeur', color='Taux',
+                 title='Taux Marge brute et Rentabilité pour la catégorie EAT',
+                 text='Valeur',
+                 labels={'Valeur': 'Taux'})
+
+    # Personnalisation du style du titre
+    fig.update_layout(title_text='',
+                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+
+    # Mettre la légende en majuscules
+    for legend_item in fig.data:
+        legend_item.name = legend_item.name.upper()
+
+    # Placer la légende en dessous du graphique sans titre
+    fig.update_layout(
+        legend=dict(
+            title_text='',  # Enlever le titre de la légende
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
+    # Centrer les étiquettes de données sur les parties concernées
+    fig.update_traces(textposition='inside')
+
+    return fig
+#############################################################################################################################""""""
+
+def generat_drink_graph(graph):
+    # Filtrer les données pour la catégorie DRINK
+    drink_data = graph[graph['Catégorie'] == 'DRINK'].copy()  # Utiliser .copy() pour éviter le avertissement
+
+    # Définir l'ordre des mois de manière appropriée
+    ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    drink_data['Mois'] = pd.Categorical(drink_data['Mois'], categories=ordered_months, ordered=True)
+    
+    # Ordonner les données par mois
+    drink_data.sort_values('Mois', inplace=True)
+
+    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Coût des produits vendus' et 'Taux Rentabilite'
+    drink_data = pd.melt(drink_data, id_vars=['Mois'], value_vars=['Taux Marge brute', 'Rentabilite'],
+                       var_name='Taux', value_name='Valeur')
+
+    # Créer un graphique en barres empilées pour les taux
+    fig = px.bar(drink_data, x='Mois', y='Valeur', color='Taux',
+                 title='Taux Marge brute et Rentabilité pour la catégorie EAT',
+                 text='Valeur',
+                 labels={'Valeur': 'Taux'})
+
+    # Personnalisation du style du titre
+    fig.update_layout(title_text='',
+                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+
+    # Mettre la légende en majuscules
+    for legend_item in fig.data:
+        legend_item.name = legend_item.name.upper()
+
+    # Placer la légende en dessous du graphique sans titre
+    fig.update_layout(
+        legend=dict(
+            title_text='',  # Enlever le titre de la légende
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
+    # Centrer les étiquettes de données sur les parties concernées
+    fig.update_traces(textposition='inside')
+
+    return fig
+
+#################################################################################################################################
+
+def generat_smoke_graph(graph):
+    # Filtrer les données pour la catégorie EAT
+    smoke_data = graph[graph['Catégorie'] == 'SMOKE'].copy()  # Utiliser .copy() pour éviter le avertissement
+
+    # Définir l'ordre des mois de manière appropriée
+    ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    smoke_data['Mois'] = pd.Categorical(smoke_data['Mois'], categories=ordered_months, ordered=True)
+    
+    # Ordonner les données par mois
+    smoke_data.sort_values('Mois', inplace=True)
+
+    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Coût des produits vendus' et 'Taux Rentabilite'
+    smoke_data = pd.melt(smoke_data, id_vars=['Mois'], value_vars=['Taux Marge brute', 'Rentabilite'],
+                       var_name='Taux', value_name='Valeur')
+
+    # Créer un graphique en barres empilées pour les taux
+    fig = px.bar(smoke_data, x='Mois', y='Valeur', color='Taux',
+                 title='Taux Marge brute et Rentabilité pour la catégorie EAT',
+                 text='Valeur',
+                 labels={'Valeur': 'Taux'})
+
+    # Personnalisation du style du titre
+    fig.update_layout(title_text='',
+                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+
+    # Mettre la légende en majuscules
+    for legend_item in fig.data:
+        legend_item.name = legend_item.name.upper()
+
+    # Placer la légende en dessous du graphique sans titre
+    fig.update_layout(
+        legend=dict(
+            title_text='',  # Enlever le titre de la légende
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
+    # Centrer les étiquettes de données sur les parties concernées
+    fig.update_traces(textposition='inside')
+
+    return fig
+#############################################################################################################################################
+
+def genera_eat_graph(graph):
+    # Filtrer les données pour la catégorie EAT
+    eat_data = graph[graph['Catégorie'] == 'EAT'].copy()  # Utiliser .copy() pour éviter le avertissement
+
+    # Définir l'ordre des mois de manière appropriée
+    ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    eat_data['Mois'] = pd.Categorical(eat_data['Mois'], categories=ordered_months, ordered=True)
+    
+    # Ordonner les données par mois
+    eat_data.sort_values('Mois', inplace=True)
+
+    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Marge brute' et 'Taux Rentabilite'
+    eat_data = pd.melt(eat_data, id_vars=['Mois'], value_vars=['Taux Opex', 'Rentabilite'],
+                       var_name='Taux', value_name='Valeur')
+
+    # Créer un graphique en barres empilées pour les taux
+    fig = px.bar(eat_data, x='Mois', y='Valeur', color='Taux',
+                 title='Taux Opex et Rentabilité pour la catégorie EAT',
+                 text='Valeur',
+                 labels={'Valeur': 'Taux'})
+
+    # Personnalisation du style du titre
+    fig.update_layout(title_text='',
+                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+
+    # Mettre la légende en majuscules
+    for legend_item in fig.data:
+        legend_item.name = legend_item.name.upper()
+
+    # Placer la légende en dessous du graphique sans titre
+    fig.update_layout(
+        legend=dict(
+            title_text='',  # Enlever le titre de la légende
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
+    # Centrer les étiquettes de données sur les parties concernées
+    fig.update_traces(textposition='inside')
+
+    return fig
+#############################################################################################################################""""""
+
+def genera_drink_graph(graph):
+    # Filtrer les données pour la catégorie DRINK
+    drink_data = graph[graph['Catégorie'] == 'DRINK'].copy()  # Utiliser .copy() pour éviter le avertissement
+
+    # Définir l'ordre des mois de manière appropriée
+    ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    drink_data['Mois'] = pd.Categorical(drink_data['Mois'], categories=ordered_months, ordered=True)
+    
+    # Ordonner les données par mois
+    drink_data.sort_values('Mois', inplace=True)
+
+    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Coût des produits vendus' et 'Taux Rentabilite'
+    drink_data = pd.melt(drink_data, id_vars=['Mois'], value_vars=['Taux Opex', 'Rentabilite'],
+                       var_name='Taux', value_name='Valeur')
+
+    # Créer un graphique en barres empilées pour les taux
+    fig = px.bar(drink_data, x='Mois', y='Valeur', color='Taux',
+                 title='Taux Opex et Rentabilité pour la catégorie EAT',
+                 text='Valeur',
+                 labels={'Valeur': 'Taux'})
+
+    # Personnalisation du style du titre
+    fig.update_layout(title_text='',
+                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+
+    # Mettre la légende en majuscules
+    for legend_item in fig.data:
+        legend_item.name = legend_item.name.upper()
+
+    # Placer la légende en dessous du graphique sans titre
+    fig.update_layout(
+        legend=dict(
+            title_text='',  # Enlever le titre de la légende
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
+    # Centrer les étiquettes de données sur les parties concernées
+    fig.update_traces(textposition='inside')
+
+    return fig
+
+#################################################################################################################################
+
+def genera_smoke_graph(graph):
+    # Filtrer les données pour la catégorie EAT
+    smoke_data = graph[graph['Catégorie'] == 'SMOKE'].copy()  # Utiliser .copy() pour éviter le avertissement
+
+    # Définir l'ordre des mois de manière appropriée
+    ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    smoke_data['Mois'] = pd.Categorical(smoke_data['Mois'], categories=ordered_months, ordered=True)
+    
+    # Ordonner les données par mois
+    smoke_data.sort_values('Mois', inplace=True)
+
+    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Coût des produits vendus' et 'Taux Rentabilite'
+    smoke_data = pd.melt(smoke_data, id_vars=['Mois'], value_vars=['Taux Opex', 'Rentabilite'],
+                       var_name='Taux', value_name='Valeur')
+
+    # Créer un graphique en barres empilées pour les taux
+    fig = px.bar(smoke_data, x='Mois', y='Valeur', color='Taux',
+                 title='Taux Opex et Rentabilité pour la catégorie EAT',
+                 text='Valeur',
+                 labels={'Valeur': 'Taux'})
+
+    # Personnalisation du style du titre
+    fig.update_layout(title_text='',
+                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+
+    # Mettre la légende en majuscules
+    for legend_item in fig.data:
+        legend_item.name = legend_item.name.upper()
+
+    # Placer la légende en dessous du graphique sans titre
+    fig.update_layout(
+        legend=dict(
+            title_text='',  # Enlever le titre de la légende
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
+    # Centrer les étiquettes de données sur les parties concernées
+    fig.update_traces(textposition='inside')
+
+    return fig
+#############################################################################################################################################
 
 
 # Copie de BD dans dif
 dif = inventaire2_df.copy()
+
+
+
 
 ################################################ end #################################################################
 
@@ -1477,7 +1923,15 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
     fig_total_revenu =  total_revenue(filtered_df)#11
     fig_total = generate_treemap_subcategory(filtered_df)#4
     fig = create_stacked_bar_chart(filtered_df)#12
-    
+    eat = generate_eat_graph(graph)
+    smoke = generate_smoke_graph(graph)
+    drink = generate_drink_graph(graph)
+    eat1 = generat_eat_graph(graph)
+    drink1 = generat_drink_graph(graph)
+    smoke1 = generat_smoke_graph(graph)
+    eat2 = generat_eat_graph(graph)
+    drink2 = generat_drink_graph(graph)
+    smoke2 = generat_smoke_graph(graph)
 
     return html.Div([
                 html.Div([
@@ -1642,10 +2096,11 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
         ], className="col-md-6"),
 
 
+         
          html.Div([
             html.Div([
                 html.Div([
-                    html.H3("Coûts des Vente et la profitabilité".upper(),
+                    html.H3("Coûts des Ventes et la profitabilité".upper(),
                              className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
                 ], className="card-header"),
                 html.Div([
@@ -1655,6 +2110,150 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
                 ], className="card-body")
             ], className="card card-primary card-outline")
         ], className="col-md-6"),
+
+
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Eat- Taux Coûts des Ventes et la Rentabilité".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=eat.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-4"),
+
+
+         html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Drink- Taux Coûts des Ventes et la Rentabilité".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=drink.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-4"),
+
+
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Smoke- Taux Coûts des Ventes et la Rentabilité".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=smoke.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-4"),
+
+
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Eat- Taux Marge brute et la Rentabilité".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=eat1.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-4"),
+
+
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Drink- Taux Marge brute et la Rentabilité".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=drink1.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-4"),
+
+
+
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Smoke- Taux Marge brute et la Rentabilité".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=smoke1.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-4"),
+
+
+
+        
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Eat- Taux Opex et la Rentabilité".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=eat2.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-4"),
+
+
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Drink- Taux Opex et la Rentabilité".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=drink2.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-4"),
+
+
+
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Smoke- Taux Opex et la Rentabilité".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=smoke2.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-4"),
+
+
+
+
+       
 
 
         ], className="row")
