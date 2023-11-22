@@ -26,7 +26,6 @@ warnings.filterwarnings("ignore")
 # Charger le DataFrame INVENTAIRE2
 #inventaire2_df = pd.read_excel("consolidated_data.xlsx")
 
-
 # Chemin du répertoire contenant les fichiers Excel
 input_directory = r'input'
 #fina = pd.read_csv(r'non.csv')
