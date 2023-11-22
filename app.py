@@ -16,7 +16,7 @@ from decimal import Decimal
 from pathlib import Path
 import locale
 from calendar import month_name
-
+import pendulum
 import plotly.io as pio
 pio.renderers.default = "browser"  # Utiliser le rendu dans le navigateur
 
