@@ -1179,6 +1179,18 @@ def total_revenue(filtered_df):
         legend_title=''.upper()
     )
 
+    # Placer la légende en dessous du graphique sans titre
+    fig.update_layout(
+        legend=dict(
+            title_text='',  # Enlever le titre de la légende
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
     # Mettre la légende en majuscules
     for legend_item in fig.data:
         legend_item.name = legend_item.name.upper()
@@ -1303,6 +1315,169 @@ def generate_bar_chart_revenue_by_month(df):
 file_path = "inputcons/Combined_Details.xlsx"
 graph = pd.read_excel(file_path)
 
+categories = ['DRINK', 'EAT', 'SMOKE']
+def generate_combined_bar_chart(file_path, categories):
+    # Charger les données depuis le fichier Excel
+    graph = pd.read_excel(file_path)
+
+    # Filtrer les données pour les catégories spécifiées
+    filtered_data = graph[graph['Catégorie'].isin(categories)]
+
+    # Définir l'ordre des mois de manière appropriée
+    ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    filtered_data['Mois'] = pd.Categorical(filtered_data['Mois'], categories=ordered_months, ordered=True)
+
+    # Trier le DataFrame par la colonne 'Mois'
+    filtered_data.sort_values('Mois', inplace=True)
+
+    # Créer un graphique en barres combinées avec l'étiquette de données
+    fig = px.bar(filtered_data, x='Mois', y='Taux Opex', color='Catégorie', text='Taux Opex',
+                 title='Taux Opex par Catégorie',
+                 labels={'Taux Opex': 'Taux Opex', 'Catégorie': 'Catégorie'})
+
+    # Personnalisation du style du titre
+    fig.update_layout(title_text='',
+                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux Opex')
+
+    # Placer l'étiquette de données à l'intérieur des barres
+    fig.update_traces(textposition='inside')
+
+    # Placer la légende en dessous du graphique sans titre
+    fig.update_layout(
+        legend=dict(
+            title_text='',  # Enlever le titre de la légende
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
+    return fig
+
+####################################################################################################################################################
+def generate_combined_bar_chart1(file_path, categories):
+    # Charger les données depuis le fichier Excel
+    graph = pd.read_excel(file_path)
+
+    # Filtrer les données pour les catégories spécifiées
+    filtered_data = graph[graph['Catégorie'].isin(categories)]
+
+    # Définir l'ordre des mois de manière appropriée
+    ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    filtered_data['Mois'] = pd.Categorical(filtered_data['Mois'], categories=ordered_months, ordered=True)
+
+    # Trier le DataFrame par la colonne 'Mois'
+    filtered_data.sort_values('Mois', inplace=True)
+
+    # Créer un graphique en barres combinées avec l'étiquette de données
+    fig = px.bar(filtered_data, x='Mois', y='Rentabilite', color='Catégorie', text='Rentabilite',
+                 title='Rentabilité par Catégorie',
+                 labels={'Rentabilite': 'Rentabilité', 'Catégorie': 'Catégorie'})
+
+    # Personnalisation du style du titre
+    fig.update_layout(title_text='',
+                      title_x=0.5, xaxis_title='Mois', yaxis_title='Rentabilité')
+
+    # Placer l'étiquette de données à l'intérieur des barres
+    fig.update_traces(textposition='inside')
+
+    # Placer la légende en dessous du graphique sans titre
+    fig.update_layout(
+        legend=dict(
+            title_text='',  # Enlever le titre de la légende
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
+    return fig
+###############################################################################################################################################
+def generate_combined_bar_chart2(file_path, categories):
+    # Charger les données depuis le fichier Excel
+    graph = pd.read_excel(file_path)
+
+    # Filtrer les données pour les catégories spécifiées
+    filtered_data = graph[graph['Catégorie'].isin(categories)]
+
+    # Définir l'ordre des mois de manière appropriée
+    ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    filtered_data['Mois'] = pd.Categorical(filtered_data['Mois'], categories=ordered_months, ordered=True)
+
+    # Trier le DataFrame par la colonne 'Mois'
+    filtered_data.sort_values('Mois', inplace=True)
+
+    # Créer un graphique en barres combinées avec l'étiquette de données
+    fig = px.bar(filtered_data, x='Mois', y='Taux Coût des produits vendus', color='Catégorie', text='Taux Coût des produits vendus',
+                 title='Taux Coût des produits vendus par Catégorie',
+                 labels={'Taux Coût des produits vendus': 'Taux Coût des produits vendus', 'Catégorie': 'Catégorie'})
+
+    # Personnalisation du style du titre
+    fig.update_layout(title_text='',
+                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux Coût des produits vendus')
+
+    # Placer l'étiquette de données à l'intérieur des barres
+    fig.update_traces(textposition='inside')
+
+    # Placer la légende en dessous du graphique sans titre
+    fig.update_layout(
+        legend=dict(
+            title_text='',  # Enlever le titre de la légende
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
+    return fig
+#################################################################################################################################################
+def generate_combined_bar_chart3(file_path, categories):
+    # Charger les données depuis le fichier Excel
+    graph = pd.read_excel(file_path)
+
+    # Filtrer les données pour les catégories spécifiées
+    filtered_data = graph[graph['Catégorie'].isin(categories)]
+
+    # Définir l'ordre des mois de manière appropriée
+    ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    filtered_data['Mois'] = pd.Categorical(filtered_data['Mois'], categories=ordered_months, ordered=True)
+
+    # Trier le DataFrame par la colonne 'Mois'
+    filtered_data.sort_values('Mois', inplace=True)
+
+    # Créer un graphique en barres combinées avec l'étiquette de données
+    fig = px.bar(filtered_data, x='Mois', y='Taux Marge brute', color='Catégorie', text='Taux Marge brute',
+                 title='Taux Marge brute par Catégorie',
+                 labels={'Taux Marge brute': 'Taux Marge brute', 'Catégorie': 'Catégorie'})
+
+    # Personnalisation du style du titre
+    fig.update_layout(title_text='',
+                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux Marge brute')
+
+    # Placer l'étiquette de données à l'intérieur des barres
+    fig.update_traces(textposition='inside')
+
+    # Placer la légende en dessous du graphique sans titre
+    fig.update_layout(
+        legend=dict(
+            title_text='',  # Enlever le titre de la légende
+            orientation="h",  # Orientation horizontale pour la légende
+            yanchor="bottom",  # Ancre la légende en bas
+            y=1.02,  # Ajuste la position verticale pour placer en dessous
+            xanchor="right",  # Ancre la légende à droite
+            x=1  # Centre la légende horizontalement
+        )
+    )
+
+    return fig
+
+#################################################################################################################################################
 def generate_eat_graph(graph):
     # Filtrer les données pour la catégorie EAT
     eat_data = graph[graph['Catégorie'] == 'EAT'].copy()  # Utiliser .copy() pour éviter le avertissement
@@ -1922,7 +2097,7 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
     fig_bar_weight_on_revenue = generate_bar_weight_on_revenue(filtered_df)#10
     fig_box_category_revenue = generate_box(filtered_df)#8
     fig_box_total_revenue = generate(filtered_df)#9
-    fig_box_total_revenu = generate_(filtered_df)#7
+    ###########fig_box_total_revenu = generate_(filtered_df)#7
     fig_total_revenu =  total_revenue(filtered_df)#11
     fig_total = generate_treemap_subcategory(filtered_df)#4
     fig = create_stacked_bar_chart(filtered_df)#12
@@ -1935,7 +2110,10 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
     eat2 = generat_eat_graph(graph)
     drink2 = generat_drink_graph(graph)
     smoke2 = generat_smoke_graph(graph)
-
+    opex = generate_combined_bar_chart(file_path, categories)
+    Rentabilite = generate_combined_bar_chart1(file_path, categories) 
+    tcpv = generate_combined_bar_chart2(file_path, categories) 
+    tmb = generate_combined_bar_chart3(file_path, categories) 
     return html.Div([
                 html.Div([
                     html.Div([
@@ -1989,12 +2167,12 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
             html.Div([
                 html.Div([
                     html.Div([
-                        html.H3("Poids de chaque Item dans sa sous-catégorie".upper(), 
+                        html.H3("Chiffre d\'affaires et Taux de Marge Brute par mois".upper(), 
                                 className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras
                     ], className="card-header"),
                     html.Div([
                         html.Div([
-                            html.Div(dcc.Graph(figure=fig_total .update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                            html.Div(dcc.Graph(figure=fig_sunburst_item_category.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
                         ], className="card-body pad table-responsive p-0")
                     ], className="card-body")
                 ], className="card card-primary card-outline")
@@ -2003,12 +2181,12 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
             html.Div([
                 html.Div([
                     html.Div([
-                        html.H3("Chiffre d\'affaires et Taux de Marge Brute par mois".upper(), 
+                        html.H3("Poids de chaque Item dans sa sous-catégorie".upper(), 
                                 className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
                     ], className="card-header"),
                     html.Div([
                         html.Div([
-                            html.Div(dcc.Graph(figure=fig_sunburst_item_category.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                            html.Div(dcc.Graph(figure=fig_total.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
                         ], className="card-body pad table-responsive p-0")
                     ], className="card-body")
                 ], className="card card-primary card-outline")
@@ -2031,12 +2209,12 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
             html.Div([
                 html.Div([
                     html.Div([
-                        html.H3("Répartition des charges par catégorie".upper(), 
+                        html.H3("Taux Opex par Catégorie".upper(), #Répartition des charges par catégorie
                                 className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
                     ], className="card-header"),
                     html.Div([
                         html.Div([
-                            html.Div(dcc.Graph(figure=fig_box_total_revenu.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                            html.Div(dcc.Graph(figure = opex.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),#figure=fig_box_total_revenu
                         ], className="card-body pad table-responsive p-0")
                     ], className="card-body")
                 ], className="card card-primary card-outline")
@@ -2103,7 +2281,7 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
          html.Div([
             html.Div([
                 html.Div([
-                    html.H3("Coûts des Ventes et la profitabilité".upper(),
+                    html.H3("Coûts des Ventes".upper(),#Répartition des charges par catégorie
                              className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
                 ], className="card-header"),
                 html.Div([
@@ -2248,6 +2426,50 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
                 html.Div([
                     html.Div([
                         html.Div(dcc.Graph(figure=smoke2.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-4"),
+
+
+         html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Taux coût des produits vendus par catégorie".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=tcpv.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-4"),
+
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Rentabilité par ncatégorie".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=Rentabilite.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-4"),
+
+
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Taux de la marge brute par catégorie".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=tmb.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
                     ], className="card-body pad table-responsive p-0")
                 ], className="card-body")
             ], className="card card-primary card-outline")
