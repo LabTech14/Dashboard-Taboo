@@ -725,17 +725,20 @@ walla['Marge brute'] = walla['CA'] - walla['Coût des produits vendus']
 walla['Resultat d\'exploitation'] = walla['Marge brute'] - walla['Opex']
 
 # Calcul de la Rentabilité
-walla['Rentabilite'] = round(walla['Resultat d\'exploitation'] / walla['CA'], 1)
+walla['Rentabilite'] = round((walla['Resultat d\'exploitation'] / walla['CA'])*100, 1)
+#walla['Rentabilite'] = (walla['Resultat d\'exploitation'] / walla['CA']) * 100
+walla['Rentabilite'] = walla['Rentabilite'].apply(lambda x: "{:.1f}%".format(x))
+
 
 # Calcul du Taux Coût des produits vendus
-walla['Taux Coût des produits vendus'] = round(walla['Coût des produits vendus'] / walla['CA'], 1)
-
+walla['Taux Coût des produits vendus'] = round((walla['Coût des produits vendus'] / walla['CA'])*100, 1)
+walla['Taux Coût des produits vendus'] = walla['Taux Coût des produits vendus'].apply(lambda x: "{:.1f}%".format(x))
 # Calcul du Taux Opex
-walla['Taux Opex'] = round(walla['Opex'] / walla['CA'], 1)
-
+walla['Taux Opex'] = round((walla['Opex'] / walla['CA'])*100, 1)
+walla['Taux Opex'] = walla['Taux Opex'].apply(lambda x: "{:.1f}%".format(x))
 # Calcul du Taux Marge brute
-walla['Taux Marge brute'] = round(walla['Marge brute'] / walla['CA'], 1)
-
+walla['Taux Marge brute'] = round((walla['Marge brute'] / walla['CA'])*100, 1)
+walla['Taux Marge brute'] =walla['Taux Marge brute'].apply(lambda x: "{:.1f}%".format(x))
 # Enregistrer les résultats dans le même fichier Excel
 walla.to_excel(excel_file_path, index=False)
 
