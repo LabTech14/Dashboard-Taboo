@@ -2435,7 +2435,7 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
          html.Div([
             html.Div([
                 html.Div([
-                    html.H3("Taux coût des produits vendus par catégorie".upper(),
+                    html.H3("Taux des ventes par catégorie".upper(),
                              className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
                 ], className="card-header"),
                 html.Div([
