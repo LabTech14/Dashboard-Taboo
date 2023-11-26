@@ -469,7 +469,7 @@ sous_categorie_list = df['Sous-catégorie'].unique()
 
 
 # Chemin du dossier contenant les fichiers à consolider
-folder_path1 = "Cdashbord/Flux horaire"
+folder_path1 = "dashbord/Flux horaire"
 
 
 def consolidate_files(folder_path1, output_folder1, output_file_name1):
