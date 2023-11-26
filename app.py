@@ -464,6 +464,109 @@ sous_categorie_list = df['Sous-catégorie'].unique()
 
 #################################################################################################################################################
 
+####################################################### Flux horaire ###################################################################################
+
+
+
+# Chemin du dossier contenant les fichiers à consolider
+folder_path1 = "C:\\Workdir\\dashbord\\Flux horaire"
+
+
+def consolidate_files(folder_path1, output_folder1, output_file_name1):
+    # Créer le dossier de sortie si nécessaire
+    output_path1 = os.path.join(folder_path1, output_folder1)
+    if not os.path.exists(output_path1):
+        os.makedirs(output_path1)
+
+    # Parcourir tous les fichiers dans le dossier
+    all_data1 = []
+    for file in os.listdir(folder_path1):
+        if file.endswith('.xlsx') or file.endswith('.csv'):
+            file_path1 = os.path.join(folder_path1, file)
+            if file.endswith('.xlsx'):
+                dff = pd.read_excel(file_path1)
+            else:  # Pour les fichiers CSV
+                dfF = pd.read_csv(file_path1)
+            
+            # Supprimer les lignes avec des valeurs manquantes
+            dff.dropna(inplace=True)
+
+            all_data1.append(dff)
+
+    # Consolider tous les DataFrames en un seul
+    consolidated_data1 = pd.concat(all_data1, ignore_index=True)
+
+    # Enregistrer le DataFrame consolidé dans un nouveau fichier Excel
+    output_file_path1 = os.path.join(output_path1, f"{output_file_name1}.xlsx")
+    consolidated_data1.to_excel(output_file_path1, index=False)
+    print(f"Consolidated data written to {output_file_path1}")
+
+
+# Appeler la fonction
+consolidate_files(folder_path1, "consolidate", "Flux horaire")
+
+###########################################################################################################################################
+import pandas as pd
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+
+# Exemple d'utilisation de la fonction
+U = "C:\\Workdir\\dashbord\\Flux horaire\\consolidate\\Flux horaire.xlsx"
+dfl = pd.read_excel(U)
+
+def create_sales_dashboard(dfl):
+    # Création des subplots
+    fig = make_subplots(rows=2, cols=2, 
+        subplot_titles=("Chiffre d'Affaires par Heure", "Nombre de Ventes par Heure",
+                        "Nombre de Vendeurs par Heure", "Panier Moyen par Heure"))
+
+    # Ajout des tracés pour chaque métrique et pour chaque mois
+    for mois in dfl['Mois'].unique():
+        df_mois = dfl[dfl['Mois'] == mois]
+        fig.add_trace(go.Bar(x=df_mois["Heure"], y=df_mois["CA"], name=f"CA - {mois}"), row=1, col=1)
+        fig.add_trace(go.Scatter(x=df_mois["Heure"], y=df_mois["ventes"], mode="lines+markers", name=f"Ventes - {mois}"), row=1, col=2)
+        fig.add_trace(go.Scatter(x=df_mois["Heure"], y=df_mois["Vendeurs"], mode="lines+markers", name=f"Vendeurs - {mois}"), row=2, col=1)
+        fig.add_trace(go.Scatter(x=df_mois["Heure"], y=df_mois["Panier Moyen"], mode="lines+markers", name=f"Panier Moyen - {mois}"), row=2, col=2)
+
+    # Création des boutons pour filtrer par mois et par année
+    mois_buttons = [
+        dict(label="Tous les mois",
+             method="update",
+             args=[{"visible": [True] * (4 * len(dfl['Mois'].unique()))}, {"title": "Toutes les données"}])
+    ]
+
+    for mois in dfl['Mois'].unique():
+        visible = [trace.name.endswith(mois) for trace in fig.data]
+        mois_buttons.append(
+            dict(label=mois,
+                 method="update",
+                 args=[{"visible": visible}, {"title": f"Données de {mois}"}])
+        )
+
+    annee_buttons = [
+        dict(label=str(annee),
+             method="update",
+             args=[{"visible": [trace.name.endswith(str(annee)) for trace in fig.data]}, {"title": f"Données de {annee}"}])
+        for annee in dfl['Année'].unique()
+    ]
+
+    fig.update_layout(
+        updatemenus=[
+            dict(buttons=mois_buttons, direction="down", x=0.1, xanchor="left", y=1.15, yanchor="top"),
+            dict(buttons=annee_buttons, direction="down", x=0.3, xanchor="left", y=1.15, yanchor="top")
+        ],
+        title="",#Analyse des Performances de Vente par Heure, Mois et Année
+        height=700
+    )
+
+    return fig
+
+
+
+#fig.show()
+
+
 ################################################## Analyse Catégorielle ##################################################################
 #from pathlib import Path
 
@@ -2114,6 +2217,9 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
     Rentabilite = generate_combined_bar_chart1(file_path, categories) 
     tcpv = generate_combined_bar_chart2(file_path, categories) 
     tmb = generate_combined_bar_chart3(file_path, categories) 
+    figl = create_sales_dashboard(dfl)
+
+
     return html.Div([
                 html.Div([
                     html.Div([
@@ -2474,6 +2580,21 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
                 ], className="card-body")
             ], className="card card-primary card-outline")
         ], className="col-md-4"),
+
+
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Analyse des Performances de Vente par Heure, Mois et Année".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=figl.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-12"),
 
 
 
