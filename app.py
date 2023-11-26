@@ -467,9 +467,9 @@ sous_categorie_list = df['Sous-catégorie'].unique()
 ####################################################### Flux horaire ###################################################################################
 
 
-
+"""
 # Chemin du dossier contenant les fichiers à consolider
-folder_path1 = "dashbord/Flux horaire"
+folder_path1 = "C:\\Workdir\\dashbord\\Flux horaire"
 
 
 def consolidate_files(folder_path1, output_folder1, output_file_name1):
@@ -504,7 +504,7 @@ def consolidate_files(folder_path1, output_folder1, output_file_name1):
 
 # Appeler la fonction
 consolidate_files(folder_path1, "consolidate", "Flux horaire")
-
+"""
 ###########################################################################################################################################
 import pandas as pd
 import plotly.graph_objects as go
@@ -512,7 +512,7 @@ from plotly.subplots import make_subplots
 
 
 # Exemple d'utilisation de la fonction
-U = "consolidate/Flux horaire.xlsx"
+U = Path("Flux horaire/consolidate/Flux horaire.xlsx")
 dfl = pd.read_excel(U)
 
 def create_sales_dashboard(dfl):
