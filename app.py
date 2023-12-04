@@ -34,10 +34,10 @@ input_directory = r'input'
 
 # Essayer de lire le fichier CSV en utilisant utf-8
 try:
-    fina = pd.read_csv('non.csv', encoding='utf-8')
+    fina = pd.read_excel('non.xlsx')
 except UnicodeDecodeError:
     # En cas d'erreur d'encodage, essayez en utilisant latin-1
-    fina = pd.read_csv('non.csv', encoding='latin-1')
+    fina = pd.read_excel('non.xlsx', encoding='latin-1')
 
 
 ############################################## exploration et traitements des données #####################################
@@ -330,8 +330,8 @@ tcd["Profitabilité"] = round((tcd["Resultat net"])/(tcd["CA"]),2)
 # Afficher le tableau croisé dynamique
 #tcd
 # Enregistrer le DataFrame filtré dans un autre fichier Excel
-new_filtered_excel_file = r"non.csv"
-tcd.to_csv(new_filtered_excel_file, index=True)
+new_filtered_excel_file = r"non.xlsx"
+tcd.to_excel(new_filtered_excel_file, index=True)
 
 print(f"Données consolidées et enregistrées dans '{new_filtered_excel_file}'.")
 
@@ -519,15 +519,15 @@ def create_sales_dashboard(dfl):
     # Création des subplots
     fig = make_subplots(rows=2, cols=2, 
         subplot_titles=("Chiffre d'Affaires par Heure", "Nombre de Ventes par Heure",
-                        "Nombre de Vendeurs par Heure", "Panier Moyen par Heure"))
+                        ))#"Nombre de Vendeurs par Heure", "Panier Moyen par Heure"
 
     # Ajout des tracés pour chaque métrique et pour chaque mois
     for mois in dfl['Mois'].unique():
         df_mois = dfl[dfl['Mois'] == mois]
         fig.add_trace(go.Bar(x=df_mois["Heure"], y=df_mois["CA"], name=f"CA - {mois}"), row=1, col=1)
-        fig.add_trace(go.Scatter(x=df_mois["Heure"], y=df_mois["ventes"], mode="lines+markers", name=f"Ventes - {mois}"), row=1, col=2)
-        fig.add_trace(go.Scatter(x=df_mois["Heure"], y=df_mois["Vendeurs"], mode="lines+markers", name=f"Vendeurs - {mois}"), row=2, col=1)
-        fig.add_trace(go.Scatter(x=df_mois["Heure"], y=df_mois["Panier Moyen"], mode="lines+markers", name=f"Panier Moyen - {mois}"), row=2, col=2)
+        #fig.add_trace(go.Scatter(x=df_mois["Heure"], y=df_mois["ventes"], mode="lines+markers", name=f"Ventes - {mois}"), row=1, col=2)
+        #fig.add_trace(go.Scatter(x=df_mois["Heure"], y=df_mois["Vendeurs"], mode="lines+markers", name=f"Vendeurs - {mois}"), row=2, col=1)
+        fig.add_trace(go.Scatter(x=df_mois["Heure"], y=df_mois["Panier Moyen"], mode="lines+markers", name=f"Panier Moyen - {mois}"), row=1, col=2)
 
     # Création des boutons pour filtrer par mois et par année
     mois_buttons = [
@@ -852,12 +852,15 @@ print(f"Les calculs ont été effectués avec succès et enregistrés dans {exce
 #################################################################################################################################################
 
 ########################################### Fonctions pour générer les visualisations des KPIs ##################################################
+import plotly.graph_objects as go
+
 def generate_pie_chart_weight_on_revenue(filtered_df):
     df_category_revenue = filtered_df.groupby('Catégorie')['Total HT'].sum().reset_index()
     total_revenue = df_category_revenue['Total HT'].sum()
 
     df_category_revenue['Poids'] = df_category_revenue['Total HT'] / total_revenue
-    df_category_revenue['Valeur Absolue'] = df_category_revenue['Total HT'] * 0.75  # 75% of Total HT
+
+    df_category_revenue['Valeur Absolue'] = df_category_revenue['Total HT']
 
     # Trouver l'indice de la part la plus petite
     min_index = df_category_revenue['Poids'].idxmin()
@@ -867,7 +870,8 @@ def generate_pie_chart_weight_on_revenue(filtered_df):
         labels=df_category_revenue['Catégorie'],
         values=df_category_revenue['Poids'],
         textinfo='label+percent',
-        hovertemplate='<b>%{label}</b><br>Poids : %{percent:.2%}<br>Valeur Absolue : %{customdata} FCFA',
+        textfont=dict(color='white'),  # Modifier la couleur des étiquettes en blanc
+        hovertemplate='<b>%{label}</b><br>Poids : %{percent:.%}<br>Valeur Absolue : %{customdata} FCFA',
         customdata=df_category_revenue['Valeur Absolue'],
         marker=dict(
             colors=['#FF5733', '#FFC300', '#36D7B7', '#3C40C6', '#27AE60', '#F39C12', '#9B59B6', '#D4AC0D', '#E74C3C', '#3498DB']
@@ -879,11 +883,11 @@ def generate_pie_chart_weight_on_revenue(filtered_df):
 
     fig.update_layout(
         legend=dict(
-            orientation="h",  # Orientation horizontale pour la légende
-            yanchor="bottom",  # Ancre la légende en bas
-            y=1.02,  # Ajuste la position verticale
-            xanchor="right",  # Ancre la légende à droite
-            x=1  # Ajuste la position horizontale
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
         )
     )
 
@@ -891,8 +895,11 @@ def generate_pie_chart_weight_on_revenue(filtered_df):
 
 
 
+
 #########    2    ########
 #def generate_treemap_item_subcategory(filtered_df):
+
+import plotly.express as px
 
 def generate_treemap_item_subcategory(filtered_df):
     df = filtered_df.copy()
@@ -909,16 +916,14 @@ def generate_treemap_item_subcategory(filtered_df):
     fig.update_layout()
 
     fig.update_traces(
-        hovertemplate='<b>%{label}</b><br>Poids: %{value:.2f}%',  # Utilisation du textinfo dans le hovertemplate
+        hovertemplate='<b>%{label}</b><br>Poids: %{customdata[0]:.0f}%',  # Format sans chiffre après la virgule
         textinfo='label+percent entry',  # Affiche le label de la catégorie et le pourcentage
-        textposition='middle center'  # Centre l'affichage du texte
+        textposition='middle center',  # Centre l'affichage du texte
+        textfont=dict(color='white')  # Couleur des étiquettes en blanc
     )
 
-    #fig.update_traces(
-    #    texttemplate='%{label}<br>Poids: %{value:.2f}%'
-    #)
-
     return fig
+
 
 
 
@@ -940,9 +945,10 @@ def generate_treemap_subcategory(filtered_df):
     fig.update_layout()
 
     fig.update_traces(
-        hovertemplate='<b>%{label}</b><br>Poids: %{value:.2f}%',  # Format avec 2 décimales
+        hovertemplate='<b>%{label}</b><br>Poids: %{value:.0f}%',  # Format avec 2 décimales
         textinfo='label+percent entry',  # Affiche le label de la catégorie et le pourcentage
-        textposition='middle center'  # Centre l'affichage du texte
+        textposition='middle center',  # Centre l'affichage du texte
+        textfont=dict(color='white')  # Couleur des étiquettes en blanc
     )
 
     
@@ -967,9 +973,9 @@ def generate_sunburst_item_category(filtered_df):
         fig.add_annotation(
             x=fina['Mois'][i],
             y=value,
-            text=f"{value:.2f}",  # Format avec deux décimales
+            text=f"{value:.0f}",  # Format avec deux décimales
             showarrow=False,
-            font=dict(size=12, color="black"),
+            font=dict(size=12, color="red"),
             yshift=10  # Ajustement vertical
         )
 
@@ -978,9 +984,9 @@ def generate_sunburst_item_category(filtered_df):
         fig.add_annotation(
             x=fina['Mois'][i],
             y=value,
-            text=f"{value:.2%}",  # Format en pourcentage
+            text=f"{value:.0%}",  # Format en pourcentage
             showarrow=False,
-            font=dict(size=12, color="red"),  # Couleur différente pour se distinguer
+            font=dict(size=12, color="white"),  # Couleur différente pour se distinguer
             yshift=10  # Ajustement vertical
         )
 
@@ -1003,7 +1009,8 @@ def generate_sunburst_item_category(filtered_df):
             yanchor="bottom",  # Ancre la légende en bas
             y=1.02,  # Ajuste la position verticale pour placer en dessous
             xanchor="right",  # Ancre la légende à droite
-            x=1  # Centre la légende horizontalement
+            x=1#,  # Centre la légende horizontalement
+            #textfont=dict(color='white')
         )
     )
 
@@ -1011,44 +1018,46 @@ def generate_sunburst_item_category(filtered_df):
 
 #Chiffre d\'affaires et Taux de Marge Brute par mois
     
-#########    4   ########
-def generate_sunburst_subcategory_within_category(filtered_df):
+#########    4 devient 6  ########
+def generate_sunburst_subcategory_within_category(filtered_df): 
+    # Calcul du total pour chaque mois et normalisation des données
     fina_grouped = fina.groupby('Mois').sum().reset_index()
-    fig = px.bar(fina_grouped, x='Mois', y=['CACHETS', 'CASH POWER', 'MARKETING_ADMIN', 'RH','CONSOMMABLES', 'Autres'],
-                 title='')  # Évolution des Charges Opérationnelles
+    total_par_mois = fina_grouped[['CACHETS', 'CASH POWER', 'MARKETING_ADMIN', 'RH', 'CONSOMMABLES', 'Autres']].sum(axis=1)
+    for column in ['CACHETS', 'CASH POWER', 'MARKETING_ADMIN', 'RH', 'CONSOMMABLES', 'Autres']:
+        fina_grouped[column] = fina_grouped[column] / total_par_mois * 100
 
-    # Personnalisation du style du titre
+    fig = px.bar(fina_grouped, x='Mois', y=['CACHETS', 'CASH POWER', 'MARKETING_ADMIN', 'RH', 'CONSOMMABLES', 'Autres'],
+                 title='')
+
     fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Chiffre d\'affaires'.upper())
+                      title_x=0.5, xaxis_title='Mois'.upper(), yaxis_title='Pourcentage (%)'.upper())
 
-    # Mettre la légende en majuscules
+    # Mise à jour de la légende
     for legend_item in fig.data:
         legend_item.name = legend_item.name.upper()
 
-    # Placer la légende en dessous du graphique sans titre
     fig.update_layout(
         legend=dict(
-            title_text='',  # Enlever le titre de la légende
-            orientation="h",  # Orientation horizontale pour la légende
-            yanchor="bottom",  # Ancre la légende en bas
-            y=1.02,  # Ajuste la position verticale pour placer en dessous
-            xanchor="right",  # Ancre la légende à droite
-            x=1  # Centre la légende horizontalement
-        )
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        ),
+        yaxis=dict(range=[0, 100])  # Assurer que l'axe des y va de 0 à 100
     )
 
-    # Calculer le total par mois et ajouter des annotations
-    # (La partie suivante reste inchangée)
-    total_par_mois = fina_grouped[['CACHETS', 'CASH POWER', 'MARKETING_ADMIN', 'RH', 'CONSOMMABLES', 'Autres']].sum(axis=1)
+    # Calculer et ajouter des annotations pour les pourcentages
     for i, (x_val, y_vals) in enumerate(zip(fina_grouped['Mois'], fina_grouped[['CACHETS', 'CASH POWER', 'MARKETING_ADMIN', 'RH', 'CONSOMMABLES', 'Autres']].values)):
         cumul_y = 0
         for y_val, cat_name in zip(y_vals, ['CACHETS', 'CASH POWER', 'MARKETING_ADMIN', 'RH', 'CONSOMMABLES', 'Autres']):
-            percentage = y_val / total_par_mois[i] * 100
             cumul_y += y_val / 2
             fig.add_annotation(x=x_val, y=cumul_y,
-                               text=f"{percentage:.1f}%",
+                               text=f"{y_val:.0f}%",
                                showarrow=False,
-                               yshift=10)
+                               yshift=10,
+                               font=dict(color='white'))  # Définition de la couleur du texte en blanc
             cumul_y += y_val / 2
 
     return fig
@@ -1074,7 +1083,7 @@ def generate_bar_weight_on_revenue(filtered_df):
         fig.add_annotation(
             x=fina['Mois'][i],
             y=value,
-            text=f"{value:.2%}",  # Format en pourcentage
+            text=f"{value:.0%}",  # Format en pourcentage
             showarrow=False,
             font=dict(size=12, color="black"),
             yshift=10  # Ajustement vertical pour éviter que le texte ne soit sur la barre
@@ -1114,59 +1123,74 @@ def generate_box(filtered_df):
 
     categories = ['Coûts des produits vendus', 'Marge brute']
 
+    # Calcul de la somme pour chaque mois et normalisation des valeurs
+    total_par_mois = fina[categories].sum(axis=1)
     for category in categories:
-        relative_values = fina[category] / fina[categories].sum(axis=1) * 100
+        fina[category] = fina[category] / total_par_mois * 100  # Normalisation
         bar_trace = go.Bar(x=fina['Mois'], y=fina[category], name=f'{category}'.upper())
         fig.add_trace(bar_trace)
 
-        # Ajout des étiquettes de pourcentage sur les barres
-        for i, value in enumerate(fina[category]):
-            percentage = relative_values[i]
-            if value != 0:  # Afficher l'étiquette seulement si la valeur n'est pas nulle
-                # Calcul de la position Y pour centrer l'étiquette
-                y_position = value / 2 if category == "Coûts des produits vendus" else fina['Coûts des produits vendus'][i] + (value / 2)
+    # Ajout des étiquettes de pourcentage sur les barres en couleur blanche
+    for i, mois in enumerate(fina['Mois']):
+        cumul_y = 0  # Cumul des valeurs précédentes pour positionner l'étiquette
+        for category in categories:
+            value = fina.at[i, category]
+            y_position = cumul_y + value / 2  # Position centrale de la barre actuelle
+            if value > 10:  # Si la valeur est assez grande, mettre l'étiquette à l'intérieur
+                text_position = 'inside'
+            else:  # Sinon, mettre l'étiquette à l'extérieur
+                text_position = 'outside'
+                y_position = cumul_y + value  # Ajustement de la position y pour l'étiquette externe
 
+            if value != 0:  # Afficher l'étiquette seulement si la valeur n'est pas nulle
                 fig.add_annotation(
-                    x=fina['Mois'][i],
+                    x=mois,
                     y=y_position,
-                    text=f"{percentage:.1f}%",
+                    text=f"{value:.1f}%",
                     showarrow=False,
-                    font=dict(size=12, color="black")
+                    font=dict(size=12, color="white"),
+                    textangle=0,
+                    xshift=0,
+                    yshift=0 if text_position == 'inside' else 10,  # Décaler légèrement vers le haut si à l'extérieur
+                    align='center',
+                    valign='middle'
                 )
+
+            cumul_y += value
 
     # Personnalisation du titre et des axes
     fig.update_layout(
         title_text='',  # Coûts des produits vendus et Marge brute
         title_x=0.5,
         xaxis_title='Mois'.upper(),
-        yaxis_title='Montant / Pourcentage'.upper(),
-        barmode='stack'  # Mode de barres empilées
+        yaxis_title='Pourcentage (%)'.upper(),
+        barmode='stack',  # Mode de barres empilées
+        yaxis=dict(range=[0, 100])  # Assurer que l'axe des y va de 0 à 100
     )
 
     # Placer la légende en dessous du graphique
     fig.update_layout(
         legend=dict(
-            orientation="h",  # Orientation horizontale pour la légende
-            yanchor="bottom",  # Ancre la légende en bas
-            y=1.02,  # Ajuste la position verticale pour placer en dessous
-            xanchor="right",  # Ancre la légende à droite
-            x=1  # Centre la légende horizontalement
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
         )
     )
 
     return fig
 
 
-
-
 #########    7    ########
 def generate(filtered_df):
+#def generate_clustered_bar_chart(filtered_df):
     fig = go.Figure()
 
-    # Ajouter une trace de barres empilées pour le chiffre d'affaires et le coût des produits vendus
-    trace1 = go.Bar(x=fina['Mois'], y=fina['Coûts des produits vendus'], name='Coûts des produits vendus'.upper())
+    # Ajouter une trace de barres groupées pour le chiffre d'affaires et le coût des produits vendus
+    #trace1 = go.Bar(x=fina['Mois'], y=fina['Coûts des produits vendus'], name='Coûts des produits vendus'.upper())
     trace2 = go.Bar(x=fina['Mois'], y=fina['CA'], name='Chiffre d\'affaires'.upper())
-    fig.add_traces([trace1, trace2])
+    fig.add_traces([trace2])#trace1, 
 
     # Personnalisation du titre et des axes
     fig.update_layout(title_text='',  # Titre du graphique
@@ -1174,22 +1198,22 @@ def generate(filtered_df):
                       xaxis_title='Mois'.upper(),  # Titre de l'axe des x
                       yaxis_title='Montant'.upper())  # Titre de l'axe des y
 
-    # Empiler les barres
-    fig.update_layout(barmode='stack')
+    # Utiliser le mode "group" au lieu de "stack"
+    fig.update_layout(barmode='group')
 
     # Ajout des étiquettes de pourcentage
     for trace in fig.data:
         y_values = trace.y
         for index, value in enumerate(y_values):
             # Calcul du pourcentage pour chaque segment de la barre
-            total = trace1.y[index] + trace2.y[index]
+            total =  trace2.y[index]#trace1.y[index] +
             percentage = (value / total * 100) if total != 0 else 0
             fig.add_annotation(
                 x=trace.x[index],
-                y=value/2 + (0 if trace == trace1 else trace1.y[index]),  # Positionnement au milieu du segment
+                y=value,
                 text=f"{percentage:.1f}%",
                 showarrow=False,
-                font=dict(size=12, color="white")
+                font=dict(size=12, color="black")
             )
 
     # Placer la légende en dessous du graphique
@@ -1345,12 +1369,19 @@ def create_stacked_bar_chart(filtered_df):
         cumul_y = 0  # Cumul des valeurs précédentes pour positionner correctement l'étiquette
         for y_val, cat_name in zip(y_vals, ["DRINKS", "EATS", "SMOKE"]):
             percentage = y_val * 100  # Convertir en pourcentage
-            cumul_y += y_val / 2  # Position à mi-hauteur de la barre actuelle
-            fig.add_annotation(x=x_val, y=cumul_y,
-                               text=f"{percentage:.1f}%",  # Format avec 1 décimale
+            y_position = cumul_y + y_val / 2  # Position à mi-hauteur de la barre actuelle
+            if percentage < 10:  # Si la valeur est petite, positionner l'étiquette à l'extérieur
+                y_position = cumul_y + y_val
+                y_shift = 10
+            else:
+                y_shift = 0
+
+            fig.add_annotation(x=x_val, y=y_position,
+                               text=f"{percentage:.0f}%",  # Format sans décimale
                                showarrow=False,
-                               yshift=10)  # Ajustez yshift pour positionner le texte au-dessus des barres
-            cumul_y += y_val / 2  # Ajouter la seconde moitié de la barre actuelle
+                               font=dict(size=12, color="white"),  # Couleur du texte en blanc
+                               yshift=y_shift)
+            cumul_y += y_val  # Ajouter la valeur de la barre actuelle
 
     # Ajout de la profitabilité comme une ligne séparée
     fig.add_trace(go.Scatter(x=fina['Mois'], y=fina['Profitabilité'], mode='lines+markers',
@@ -1366,6 +1397,7 @@ def create_stacked_bar_chart(filtered_df):
 
 ################################################## Autre ##############################################################
 def generate_bar_chart_revenue_by_month(df):
+    # Calculer le chiffre d'affaires mensuel par catégorie
     df_monthly_revenue = df.groupby(['Mois', 'Catégorie'])['Total HT'].sum().reset_index()
 
     # Calculer le pourcentage par catégorie
@@ -1374,33 +1406,42 @@ def generate_bar_chart_revenue_by_month(df):
     # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
 
+    # Initialiser la figure
     fig = go.Figure()
 
-    categories = df_monthly_revenue['Catégorie'].unique()
-    colors = ['#FF5733', '#FFC300', '#36D7B7', '#3C40C6', '#27AE60', '#F39C12', '#9B59B6', '#D4AC0D', '#E74C3C', '#3498DB']
+    # Obtenir les catégories uniques et les couleurs
+    catégories = df_monthly_revenue['Catégorie'].unique()
+    couleurs = ['#FF5733', '#FFC300', '#36D7B7', '#3C40C6', '#27AE60', '#F39C12', '#9B59B6', '#D4AC0D', '#E74C3C', '#3498DB']
 
-    for category, color in zip(categories, colors):
-        category_data = df_monthly_revenue[df_monthly_revenue['Catégorie'] == category]
+    for catégorie, couleur in zip(catégories, couleurs):
+        # Filtrer les données pour la catégorie actuelle
+        category_data = df_monthly_revenue[df_monthly_revenue['Catégorie'] == catégorie]
+
         # Utiliser l'ordre des mois
         category_data['Mois'] = pd.Categorical(category_data['Mois'], categories=ordered_months, ordered=True)
         category_data = category_data.sort_values('Mois')
-        
-        # Formater les valeurs en pourcentage sans virgule
-        formatted_values = category_data['Poids'].astype(int).astype(str) + '%'  
 
+        # Normaliser les valeurs pour représenter des pourcentages
+        category_data['Normalized'] = category_data['Poids'] / 100
+
+        # Ajouter la trace de la barre à la figure
         fig.add_trace(go.Bar(
             x=category_data['Mois'],
-            y=category_data['Total HT'],
-            name=category,
-            marker=dict(color=color),
-            text=formatted_values,
-            textposition='auto'
+            y=category_data['Normalized'],
+            name=catégorie,
+            marker=dict(color=couleur),
+            text=category_data['Poids'].astype(int).astype(str) + '%',
+            textposition='auto',
+            hoverinfo='text+y',
+            showlegend=True,
+            textfont=dict(color='white')
         ))
 
+    # Mettre à jour la mise en page de la figure
     fig.update_layout(
         barmode='stack',
         xaxis=dict(title='Mois'),
-        yaxis=dict(title='Total HT'),
+        yaxis=dict(title='Pourcentage'),
         legend=dict(
             orientation='h',
             yanchor='bottom',
@@ -1408,10 +1449,14 @@ def generate_bar_chart_revenue_by_month(df):
             xanchor='right',
             x=1
         ),
-        #title='Chiffre d\'affaires mensuel par catégorie',
+        # title='Chiffre d\'affaires mensuelles par catégorie',
     )
 
+    # Retourner la figure
     return fig
+
+
+
 
 ##################################################################### new graph #######################################################
 # Charger les données depuis le fichier Excel
@@ -1581,97 +1626,107 @@ def generate_combined_bar_chart3(file_path, categories):
     return fig
 
 #################################################################################################################################################
+
 def generate_eat_graph(graph):
     # Filtrer les données pour la catégorie EAT
-    eat_data = graph[graph['Catégorie'] == 'EAT'].copy()  # Utiliser .copy() pour éviter le avertissement
+    eat_data = graph[graph['Catégorie'] == 'EAT'].copy()
 
-    # Définir l'ordre des mois de manière appropriée
+    # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
     eat_data['Mois'] = pd.Categorical(eat_data['Mois'], categories=ordered_months, ordered=True)
-    
+
     # Ordonner les données par mois
     eat_data.sort_values('Mois', inplace=True)
 
-    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Coût des produits vendus' et 'Taux Rentabilite'
+    # Remodeler les données
     eat_data = pd.melt(eat_data, id_vars=['Mois'], value_vars=['Taux Coût des produits vendus', 'Rentabilite'],
                        var_name='Taux', value_name='Valeur')
 
-    # Créer un graphique en barres empilées pour les taux
-    fig = px.bar(eat_data, x='Mois', y='Valeur', color='Taux',
+    # S'assurer que les valeurs sont des nombres et non des chaînes
+    eat_data['Valeur'] = eat_data['Valeur'].replace('%', '', regex=True).astype(float)
+
+    # Créer un graphique en barres groupées
+    fig = px.bar(eat_data, x='Mois', y='Valeur', color='Taux', barmode='group',
                  title='Taux Coût des produits vendus et Rentabilité pour la catégorie EAT',
-                 text='Valeur',
-                 labels={'Valeur': 'Taux'})
+                 text='Valeur', labels={'Valeur': 'Taux'},
+                 color_discrete_map={'Taux Coût des produits vendus': 'blue', 'Rentabilite': 'red'})
 
     # Personnalisation du style du titre
-    fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+    fig.update_layout(title_text='', title_x=0.5, xaxis_title='Mois', yaxis_title='Taux (%)')
 
-    # Mettre la légende en majuscules
+    # Mise à jour de la légende
     for legend_item in fig.data:
         legend_item.name = legend_item.name.upper()
 
     # Placer la légende en dessous du graphique sans titre
     fig.update_layout(
         legend=dict(
-            title_text='',  # Enlever le titre de la légende
-            orientation="h",  # Orientation horizontale pour la légende
-            yanchor="bottom",  # Ancre la légende en bas
-            y=1.02,  # Ajuste la position verticale pour placer en dessous
-            xanchor="right",  # Ancre la légende à droite
-            x=1  # Centre la légende horizontalement
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
         )
     )
 
-    # Centrer les étiquettes de données sur les parties concernées
-    fig.update_traces(textposition='inside')
+    # Centrer les étiquettes de données sur les barres
+    #fig.update_traces(textposition='inside')
+    # Mettre les étiquettes de données en blanc et sans chiffre après la virgule
+    fig.update_traces(textposition='inside', textfont=dict(color='white'))
 
     return fig
+
+
 #############################################################################################################################""""""
 def generate_drink_graph(graph):
     # Filtrer les données pour la catégorie DRINK
-    drink_data = graph[graph['Catégorie'] == 'DRINK'].copy()  # Utiliser .copy() pour éviter le avertissement
+    drink_data = graph[graph['Catégorie'] == 'DRINK'].copy()
 
-    # Définir l'ordre des mois de manière appropriée
+    # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
     drink_data['Mois'] = pd.Categorical(drink_data['Mois'], categories=ordered_months, ordered=True)
-    
+
     # Ordonner les données par mois
     drink_data.sort_values('Mois', inplace=True)
 
-    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Coût des produits vendus' et 'Taux Rentabilite'
+    # Remodeler les données
     drink_data = pd.melt(drink_data, id_vars=['Mois'], value_vars=['Taux Coût des produits vendus', 'Rentabilite'],
-                       var_name='Taux', value_name='Valeur')
+                         var_name='Taux', value_name='Valeur')
 
-    # Créer un graphique en barres empilées pour les taux
-    fig = px.bar(drink_data, x='Mois', y='Valeur', color='Taux',
-                 title='Taux Coût des produits vendus et Rentabilité pour la catégorie EAT',
-                 text='Valeur',
-                 labels={'Valeur': 'Taux'})
+    # Convertir les pourcentages en nombres flottants
+    drink_data['Valeur'] = drink_data['Valeur'].replace('%', '', regex=True).astype(float)
+
+    # Créer un graphique en barres groupées avec des couleurs personnalisées
+    fig = px.bar(drink_data, x='Mois', y='Valeur', color='Taux', barmode='group',
+                 title='Taux Coût des produits vendus et Rentabilité pour la catégorie DRINK',
+                 text='Valeur', labels={'Valeur': 'Taux'},
+                 color_discrete_map={'Taux Coût des produits vendus': 'orange', 'Rentabilite': 'green'})
 
     # Personnalisation du style du titre
-    fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+    fig.update_layout(title_text='', title_x=0.5, xaxis_title='Mois', yaxis_title='Taux (%)')
 
-    # Mettre la légende en majuscules
+    # Mise à jour de la légende
     for legend_item in fig.data:
         legend_item.name = legend_item.name.upper()
 
     # Placer la légende en dessous du graphique sans titre
     fig.update_layout(
         legend=dict(
-            title_text='',  # Enlever le titre de la légende
-            orientation="h",  # Orientation horizontale pour la légende
-            yanchor="bottom",  # Ancre la légende en bas
-            y=1.02,  # Ajuste la position verticale pour placer en dessous
-            xanchor="right",  # Ancre la légende à droite
-            x=1  # Centre la légende horizontalement
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
         )
     )
 
-    # Centrer les étiquettes de données sur les parties concernées
-    fig.update_traces(textposition='inside')
+    # Mettre les étiquettes de données en blanc et sans chiffre après la virgule
+    fig.update_traces(textposition='inside', textfont=dict(color='white'))
 
     return fig
+
 
 #################################################################################################################################
 
@@ -1684,92 +1739,98 @@ def generate_smoke_graph(graph):
     # Filtrer les données pour la catégorie EAT
     smoke_data = graph[graph['Catégorie'] == 'SMOKE'].copy()  # Utiliser .copy() pour éviter le avertissement
 
-    # Définir l'ordre des mois de manière appropriée
+    # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
     smoke_data['Mois'] = pd.Categorical(smoke_data['Mois'], categories=ordered_months, ordered=True)
-    
+
     # Ordonner les données par mois
     smoke_data.sort_values('Mois', inplace=True)
 
-    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Coût des produits vendus' et 'Taux Rentabilite'
+    # Remodeler les données
     smoke_data = pd.melt(smoke_data, id_vars=['Mois'], value_vars=['Taux Coût des produits vendus', 'Rentabilite'],
-                       var_name='Taux', value_name='Valeur')
+                         var_name='Taux', value_name='Valeur')
 
-    # Créer un graphique en barres empilées pour les taux
-    fig = px.bar(smoke_data, x='Mois', y='Valeur', color='Taux',
-                 title='Taux Coût des produits vendus et Rentabilité pour la catégorie EAT',
-                 text='Valeur',
-                 labels={'Valeur': 'Taux'})
+    # Convertir les pourcentages en nombres flottants
+    smoke_data['Valeur'] = smoke_data['Valeur'].replace('%', '', regex=True).astype(float)
+
+    # Créer un graphique en barres groupées avec des couleurs personnalisées
+    fig = px.bar(smoke_data, x='Mois', y='Valeur', color='Taux', barmode='group',
+                 title='Taux Coût des produits vendus et Rentabilité pour la catégorie SMOKE',
+                 text='Valeur', labels={'Valeur': 'Taux'},
+                 color_discrete_map={'Taux Coût des produits vendus': 'purple', 'Rentabilite': 'gold'})
 
     # Personnalisation du style du titre
-    fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+    fig.update_layout(title_text='', title_x=0.5, xaxis_title='Mois', yaxis_title='Taux (%)')
 
-    # Mettre la légende en majuscules
+    # Mise à jour de la légende
     for legend_item in fig.data:
         legend_item.name = legend_item.name.upper()
 
     # Placer la légende en dessous du graphique sans titre
     fig.update_layout(
         legend=dict(
-            title_text='',  # Enlever le titre de la légende
-            orientation="h",  # Orientation horizontale pour la légende
-            yanchor="bottom",  # Ancre la légende en bas
-            y=1.02,  # Ajuste la position verticale pour placer en dessous
-            xanchor="right",  # Ancre la légende à droite
-            x=1  # Centre la légende horizontalement
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
         )
     )
 
-    # Centrer les étiquettes de données sur les parties concernées
-    fig.update_traces(textposition='inside')
+    # Mettre les étiquettes de données en blanc et sans chiffre après la virgule
+    fig.update_traces(textposition='inside', textfont=dict(color='white'))
 
     return fig
+
 #############################################################################################################################################
 
 def generat_eat_graph(graph):
-    # Filtrer les données pour la catégorie EAT
+    # Filtrer les données pour la catégorie EAT ['Taux Marge brute', 'Rentabilite']
     eat_data = graph[graph['Catégorie'] == 'EAT'].copy()  # Utiliser .copy() pour éviter le avertissement
 
-    # Définir l'ordre des mois de manière appropriée
+    # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
     eat_data['Mois'] = pd.Categorical(eat_data['Mois'], categories=ordered_months, ordered=True)
-    
+
     # Ordonner les données par mois
     eat_data.sort_values('Mois', inplace=True)
 
-    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Marge brute' et 'Taux Rentabilite'
+    # Remodeler les données
     eat_data = pd.melt(eat_data, id_vars=['Mois'], value_vars=['Taux Marge brute', 'Rentabilite'],
                        var_name='Taux', value_name='Valeur')
 
-    # Créer un graphique en barres empilées pour les taux
-    fig = px.bar(eat_data, x='Mois', y='Valeur', color='Taux',
+    # S'assurer que les valeurs sont des nombres et non des chaînes
+    eat_data['Valeur'] = eat_data['Valeur'].replace('%', '', regex=True).astype(float)
+
+    # Créer un graphique en barres groupées
+    fig = px.bar(eat_data, x='Mois', y='Valeur', color='Taux', barmode='group',
                  title='Taux Marge brute et Rentabilité pour la catégorie EAT',
-                 text='Valeur',
-                 labels={'Valeur': 'Taux'})
+                 text='Valeur', labels={'Valeur': 'Taux'},
+                 color_discrete_map={'Taux Marge brute': 'blue', 'Rentabilite': 'red'})
 
     # Personnalisation du style du titre
-    fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+    fig.update_layout(title_text='', title_x=0.5, xaxis_title='Mois', yaxis_title='Taux (%)')
 
-    # Mettre la légende en majuscules
+    # Mise à jour de la légende
     for legend_item in fig.data:
         legend_item.name = legend_item.name.upper()
 
     # Placer la légende en dessous du graphique sans titre
     fig.update_layout(
         legend=dict(
-            title_text='',  # Enlever le titre de la légende
-            orientation="h",  # Orientation horizontale pour la légende
-            yanchor="bottom",  # Ancre la légende en bas
-            y=1.02,  # Ajuste la position verticale pour placer en dessous
-            xanchor="right",  # Ancre la légende à droite
-            x=1  # Centre la légende horizontalement
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
         )
     )
 
-    # Centrer les étiquettes de données sur les parties concernées
-    fig.update_traces(textposition='inside')
+    # Centrer les étiquettes de données sur les barres
+    #fig.update_traces(textposition='inside')
+    fig.update_traces(textposition='inside', textfont=dict(color='white'))
 
     return fig
 #############################################################################################################################""""""
@@ -1778,140 +1839,146 @@ def generat_drink_graph(graph):
     # Filtrer les données pour la catégorie DRINK
     drink_data = graph[graph['Catégorie'] == 'DRINK'].copy()  # Utiliser .copy() pour éviter le avertissement
 
-    # Définir l'ordre des mois de manière appropriée
+    # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
     drink_data['Mois'] = pd.Categorical(drink_data['Mois'], categories=ordered_months, ordered=True)
-    
+
     # Ordonner les données par mois
     drink_data.sort_values('Mois', inplace=True)
 
-    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Coût des produits vendus' et 'Taux Rentabilite'
+    # Remodeler les données
     drink_data = pd.melt(drink_data, id_vars=['Mois'], value_vars=['Taux Marge brute', 'Rentabilite'],
-                       var_name='Taux', value_name='Valeur')
+                         var_name='Taux', value_name='Valeur')
 
-    # Créer un graphique en barres empilées pour les taux
-    fig = px.bar(drink_data, x='Mois', y='Valeur', color='Taux',
-                 title='Taux Marge brute et Rentabilité pour la catégorie EAT',
-                 text='Valeur',
-                 labels={'Valeur': 'Taux'})
+    # Convertir les pourcentages en nombres flottants
+    drink_data['Valeur'] = drink_data['Valeur'].replace('%', '', regex=True).astype(float)
+
+    # Créer un graphique en barres groupées avec des couleurs personnalisées
+    fig = px.bar(drink_data, x='Mois', y='Valeur', color='Taux', barmode='group',
+                 title='Taux Marge brute et Rentabilité pour la catégorie DRINK',
+                 text='Valeur', labels={'Valeur': 'Taux'},
+                 color_discrete_map={'Taux Marge brute': 'orange', 'Rentabilite': 'green'})
 
     # Personnalisation du style du titre
-    fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+    fig.update_layout(title_text='', title_x=0.5, xaxis_title='Mois', yaxis_title='Taux (%)')
 
-    # Mettre la légende en majuscules
+    # Mise à jour de la légende
     for legend_item in fig.data:
         legend_item.name = legend_item.name.upper()
 
     # Placer la légende en dessous du graphique sans titre
     fig.update_layout(
         legend=dict(
-            title_text='',  # Enlever le titre de la légende
-            orientation="h",  # Orientation horizontale pour la légende
-            yanchor="bottom",  # Ancre la légende en bas
-            y=1.02,  # Ajuste la position verticale pour placer en dessous
-            xanchor="right",  # Ancre la légende à droite
-            x=1  # Centre la légende horizontalement
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
         )
     )
 
-    # Centrer les étiquettes de données sur les parties concernées
-    fig.update_traces(textposition='inside')
+    # Mettre les étiquettes de données en blanc et sans chiffre après la virgule
+    fig.update_traces(textposition='inside', textfont=dict(color='white'))
 
     return fig
-
 #################################################################################################################################
 
 def generat_smoke_graph(graph):
     # Filtrer les données pour la catégorie EAT
     smoke_data = graph[graph['Catégorie'] == 'SMOKE'].copy()  # Utiliser .copy() pour éviter le avertissement
 
-    # Définir l'ordre des mois de manière appropriée
+    # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
     smoke_data['Mois'] = pd.Categorical(smoke_data['Mois'], categories=ordered_months, ordered=True)
-    
+
     # Ordonner les données par mois
     smoke_data.sort_values('Mois', inplace=True)
 
-    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Coût des produits vendus' et 'Taux Rentabilite'
+    # Remodeler les données
     smoke_data = pd.melt(smoke_data, id_vars=['Mois'], value_vars=['Taux Marge brute', 'Rentabilite'],
-                       var_name='Taux', value_name='Valeur')
+                         var_name='Taux', value_name='Valeur')
 
-    # Créer un graphique en barres empilées pour les taux
-    fig = px.bar(smoke_data, x='Mois', y='Valeur', color='Taux',
-                 title='Taux Marge brute et Rentabilité pour la catégorie EAT',
-                 text='Valeur',
-                 labels={'Valeur': 'Taux'})
+    # Convertir les pourcentages en nombres flottants
+    smoke_data['Valeur'] = smoke_data['Valeur'].replace('%', '', regex=True).astype(float)
+
+    # Créer un graphique en barres groupées avec des couleurs personnalisées
+    fig = px.bar(smoke_data, x='Mois', y='Valeur', color='Taux', barmode='group',
+                 title='Taux Marge brute et Rentabilité pour la catégorie SMOKE',
+                 text='Valeur', labels={'Valeur': 'Taux'},
+                 color_discrete_map={'Taux Marge brute': 'purple', 'Rentabilite': 'gold'})
 
     # Personnalisation du style du titre
-    fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+    fig.update_layout(title_text='', title_x=0.5, xaxis_title='Mois', yaxis_title='Taux (%)')
 
-    # Mettre la légende en majuscules
+    # Mise à jour de la légende
     for legend_item in fig.data:
         legend_item.name = legend_item.name.upper()
 
     # Placer la légende en dessous du graphique sans titre
     fig.update_layout(
         legend=dict(
-            title_text='',  # Enlever le titre de la légende
-            orientation="h",  # Orientation horizontale pour la légende
-            yanchor="bottom",  # Ancre la légende en bas
-            y=1.02,  # Ajuste la position verticale pour placer en dessous
-            xanchor="right",  # Ancre la légende à droite
-            x=1  # Centre la légende horizontalement
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
         )
     )
 
-    # Centrer les étiquettes de données sur les parties concernées
-    fig.update_traces(textposition='inside')
+    # Mettre les étiquettes de données en blanc et sans chiffre après la virgule
+    fig.update_traces(textposition='inside', textfont=dict(color='white'))
 
     return fig
 #############################################################################################################################################
 
 def genera_eat_graph(graph):
-    # Filtrer les données pour la catégorie EAT
+    # Filtrer les données pour la catégorie EAT Taux Opex
     eat_data = graph[graph['Catégorie'] == 'EAT'].copy()  # Utiliser .copy() pour éviter le avertissement
 
-    # Définir l'ordre des mois de manière appropriée
+    # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
     eat_data['Mois'] = pd.Categorical(eat_data['Mois'], categories=ordered_months, ordered=True)
-    
+
     # Ordonner les données par mois
     eat_data.sort_values('Mois', inplace=True)
 
-    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Marge brute' et 'Taux Rentabilite'
+    # Remodeler les données
     eat_data = pd.melt(eat_data, id_vars=['Mois'], value_vars=['Taux Opex', 'Rentabilite'],
                        var_name='Taux', value_name='Valeur')
 
-    # Créer un graphique en barres empilées pour les taux
-    fig = px.bar(eat_data, x='Mois', y='Valeur', color='Taux',
+    # S'assurer que les valeurs sont des nombres et non des chaînes
+    eat_data['Valeur'] = eat_data['Valeur'].replace('%', '', regex=True).astype(float)
+
+    # Créer un graphique en barres groupées
+    fig = px.bar(eat_data, x='Mois', y='Valeur', color='Taux', barmode='group',
                  title='Taux Opex et Rentabilité pour la catégorie EAT',
-                 text='Valeur',
-                 labels={'Valeur': 'Taux'})
+                 text='Valeur', labels={'Valeur': 'Taux'},
+                 color_discrete_map={'Taux Opex': 'blue', 'Rentabilite': 'red'})
 
     # Personnalisation du style du titre
-    fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+    fig.update_layout(title_text='', title_x=0.5, xaxis_title='Mois', yaxis_title='Taux (%)')
 
-    # Mettre la légende en majuscules
+    # Mise à jour de la légende
     for legend_item in fig.data:
         legend_item.name = legend_item.name.upper()
 
     # Placer la légende en dessous du graphique sans titre
     fig.update_layout(
         legend=dict(
-            title_text='',  # Enlever le titre de la légende
-            orientation="h",  # Orientation horizontale pour la légende
-            yanchor="bottom",  # Ancre la légende en bas
-            y=1.02,  # Ajuste la position verticale pour placer en dessous
-            xanchor="right",  # Ancre la légende à droite
-            x=1  # Centre la légende horizontalement
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
         )
     )
 
-    # Centrer les étiquettes de données sur les parties concernées
-    fig.update_traces(textposition='inside')
+    # Centrer les étiquettes de données sur les barres
+    #fig.update_traces(textposition='inside')
+    fig.update_traces(textposition='inside', textfont=dict(color='white'))
 
     return fig
 #############################################################################################################################""""""
@@ -1920,93 +1987,96 @@ def genera_drink_graph(graph):
     # Filtrer les données pour la catégorie DRINK
     drink_data = graph[graph['Catégorie'] == 'DRINK'].copy()  # Utiliser .copy() pour éviter le avertissement
 
-    # Définir l'ordre des mois de manière appropriée
+    # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
     drink_data['Mois'] = pd.Categorical(drink_data['Mois'], categories=ordered_months, ordered=True)
-    
+
     # Ordonner les données par mois
     drink_data.sort_values('Mois', inplace=True)
 
-    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Coût des produits vendus' et 'Taux Rentabilite'
+    # Remodeler les données
     drink_data = pd.melt(drink_data, id_vars=['Mois'], value_vars=['Taux Opex', 'Rentabilite'],
-                       var_name='Taux', value_name='Valeur')
+                         var_name='Taux', value_name='Valeur')
 
-    # Créer un graphique en barres empilées pour les taux
-    fig = px.bar(drink_data, x='Mois', y='Valeur', color='Taux',
-                 title='Taux Opex et Rentabilité pour la catégorie EAT',
-                 text='Valeur',
-                 labels={'Valeur': 'Taux'})
+    # Convertir les pourcentages en nombres flottants
+    drink_data['Valeur'] = drink_data['Valeur'].replace('%', '', regex=True).astype(float)
+
+    # Créer un graphique en barres groupées avec des couleurs personnalisées
+    fig = px.bar(drink_data, x='Mois', y='Valeur', color='Taux', barmode='group',
+                 title='Taux Opex et Rentabilité pour la catégorie DRINK',
+                 text='Valeur', labels={'Valeur': 'Taux'},
+                 color_discrete_map={'Taux Opex': 'orange', 'Rentabilite': 'green'})
 
     # Personnalisation du style du titre
-    fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+    fig.update_layout(title_text='', title_x=0.5, xaxis_title='Mois', yaxis_title='Taux (%)')
 
-    # Mettre la légende en majuscules
+    # Mise à jour de la légende
     for legend_item in fig.data:
         legend_item.name = legend_item.name.upper()
 
     # Placer la légende en dessous du graphique sans titre
     fig.update_layout(
         legend=dict(
-            title_text='',  # Enlever le titre de la légende
-            orientation="h",  # Orientation horizontale pour la légende
-            yanchor="bottom",  # Ancre la légende en bas
-            y=1.02,  # Ajuste la position verticale pour placer en dessous
-            xanchor="right",  # Ancre la légende à droite
-            x=1  # Centre la légende horizontalement
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
         )
     )
 
-    # Centrer les étiquettes de données sur les parties concernées
-    fig.update_traces(textposition='inside')
+    # Mettre les étiquettes de données en blanc et sans chiffre après la virgule
+    fig.update_traces(textposition='inside', textfont=dict(color='white'))
 
     return fig
-
 #################################################################################################################################
 
 def genera_smoke_graph(graph):
     # Filtrer les données pour la catégorie EAT
     smoke_data = graph[graph['Catégorie'] == 'SMOKE'].copy()  # Utiliser .copy() pour éviter le avertissement
 
-    # Définir l'ordre des mois de manière appropriée
+    # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
     smoke_data['Mois'] = pd.Categorical(smoke_data['Mois'], categories=ordered_months, ordered=True)
-    
+
     # Ordonner les données par mois
     smoke_data.sort_values('Mois', inplace=True)
 
-    # Remodeler les données pour avoir une colonne 'Taux' qui peut prendre les valeurs 'Taux Coût des produits vendus' et 'Taux Rentabilite'
+    # Remodeler les données
     smoke_data = pd.melt(smoke_data, id_vars=['Mois'], value_vars=['Taux Opex', 'Rentabilite'],
-                       var_name='Taux', value_name='Valeur')
+                         var_name='Taux', value_name='Valeur')
 
-    # Créer un graphique en barres empilées pour les taux
-    fig = px.bar(smoke_data, x='Mois', y='Valeur', color='Taux',
-                 title='Taux Opex et Rentabilité pour la catégorie EAT',
-                 text='Valeur',
-                 labels={'Valeur': 'Taux'})
+    # Convertir les pourcentages en nombres flottants
+    smoke_data['Valeur'] = smoke_data['Valeur'].replace('%', '', regex=True).astype(float)
+
+    # Créer un graphique en barres groupées avec des couleurs personnalisées
+    fig = px.bar(smoke_data, x='Mois', y='Valeur', color='Taux', barmode='group',
+                 title='Taux Opex et Rentabilité pour la catégorie SMOKE',
+                 text='Valeur', labels={'Valeur': 'Taux'},
+                 color_discrete_map={'Taux Opex': 'purple', 'Rentabilite': 'gold'})
 
     # Personnalisation du style du titre
-    fig.update_layout(title_text='',
-                      title_x=0.5, xaxis_title='Mois', yaxis_title='Taux')
+    fig.update_layout(title_text='', title_x=0.5, xaxis_title='Mois', yaxis_title='Taux (%)')
 
-    # Mettre la légende en majuscules
+    # Mise à jour de la légende
     for legend_item in fig.data:
         legend_item.name = legend_item.name.upper()
 
     # Placer la légende en dessous du graphique sans titre
     fig.update_layout(
         legend=dict(
-            title_text='',  # Enlever le titre de la légende
-            orientation="h",  # Orientation horizontale pour la légende
-            yanchor="bottom",  # Ancre la légende en bas
-            y=1.02,  # Ajuste la position verticale pour placer en dessous
-            xanchor="right",  # Ancre la légende à droite
-            x=1  # Centre la légende horizontalement
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
         )
     )
 
-    # Centrer les étiquettes de données sur les parties concernées
-    fig.update_traces(textposition='inside')
+    # Mettre les étiquettes de données en blanc et sans chiffre après la virgule
+    fig.update_traces(textposition='inside', textfont=dict(color='white'))
 
     return fig
 #############################################################################################################################################
@@ -2210,9 +2280,9 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
     eat1 = generat_eat_graph(graph)
     drink1 = generat_drink_graph(graph)
     smoke1 = generat_smoke_graph(graph)
-    eat2 = generat_eat_graph(graph)
-    drink2 = generat_drink_graph(graph)
-    smoke2 = generat_smoke_graph(graph)
+    eat2 = genera_eat_graph(graph)
+    drink2 = genera_drink_graph(graph)
+    smoke2 = genera_smoke_graph(graph)
     opex = generate_combined_bar_chart(file_path, categories)
     Rentabilite = generate_combined_bar_chart1(file_path, categories) 
     tcpv = generate_combined_bar_chart2(file_path, categories) 
