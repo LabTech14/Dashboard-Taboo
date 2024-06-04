@@ -2200,9 +2200,8 @@ app = dash.Dash(__name__)
 
 # Ajustement de la taille des graphiques Sunburst
 sunburst_height = 200
-# Définition de la mise en page principale
+
 app.layout = html.Div([
-    dcc.Location(id='url', refresh=False),
     html.Link(
         rel='stylesheet',
         href='https://adminlte.io/themes/v3/plugins/fontawesome-free/css/all.min.css'),    
@@ -2212,18 +2211,12 @@ app.layout = html.Div([
     html.Link(
         rel='stylesheet',
         href='https://adminlte.io/themes/v3/dist/css/adminlte.min.css?v=3.2.0'),
-    html.Div(id='page-content')
-])
-
-# Définition des différentes pages de l'application
-page_1_layout = html.Div([
-    dcc.Link('DASHBOARD ANALYSE TB', href='/page-2') ,# Lien vers la page 2
 
     html.Div([
         html.Div([
             html.Div([
                 html.Div([
-                    html.H1("DASHBOARD  INVENTAIRES", className="m-0",
+                    html.H1("DASHBOARD D'ANALYSE DES DONNEES", className="m-0",
                             style={'font-weight': 'bold', 'font-size': '36px'})  # Ajoutez ici le style CSS pour le gras et la taille de police)
                 ], className="col-sm-8"),
                 html.Div([
@@ -2267,77 +2260,9 @@ page_1_layout = html.Div([
             ], className="container-fluid")
         ], className="row"),
     ], className="content"),
-        dcc.Link('DASHBOARD ANALYSE TB', href='/page-2') # Lien vers la page 2
 
-
-])
-
-page_2_layout = html.Div([
-    dcc.Link('DASHBOARD  INVENTAIRES', href='/'), # Lien vers la page 1
-
-
-    html.Div([
-        html.Div([
-            html.Div([
-                html.Div([
-                    html.H1("DASHBOARD ANALYSE TB", className="m-0",
-                            style={'font-weight': 'bold', 'font-size': '36px'})  # Ajoutez ici le style CSS pour le gras et la taille de police)
-                ], className="col-sm-8"),
-                html.Div([
-                    html.Ol([
-                        html.Li(id='current-time', className="breadcrumb-item active")
-                    ], className="breadcrumb float-sm-right")
-                ], className="col-sm-4")
-            ], className="row mb-2"),
-            html.Div([
-                html.Div([
-                    dcc.Dropdown(id='year-dropdown', options=[{'label': str(annee), 'value': annee} for annee in annee_list],
-                                value=None, placeholder="Sélectionnez les années", multi=True)
-                ], className='col-md-3'),
-
-                html.Div([
-                    dcc.Dropdown(id='month-dropdown', options=[{'label': mois, 'value': mois} for mois in mois_list],
-                                value=None, placeholder="Sélectionnez les mois", multi=True)
-                ], className='col-md-3'),
-                    
-                html.Div([
-                    dcc.Dropdown(id='categorie-dropdown', options=[{'label': str(categorie), 'value': categorie} for categorie in categorie_list],
-                                value=None, placeholder="Sélectionnez les catégories", multi=True)
-                ], className='col-md-3'),
-
-                html.Div([
-                    dcc.Dropdown(id='sous-categorie-dropdown', options=[{'label': str(sous_categorie), 'value': sous_categorie} for sous_categorie in sous_categorie_list],
-                                value=None, placeholder="Sélectionnez les sous catégorie", multi=True)
-                ], className='col-md-3'),
-
-            ], className='row mb-3'),
-
-            html.Div(id='revenue-summary')
-
-        ], className="container-fluid")
-    ], className="content-header mb-4 pb-1", style={'background-color': '#c2c2c3'} ),
-
-    html.Section([
-        html.Div([
-            html.Div([
-                html.Div(id='visualizations-container'),
-            ], className="container-fluid")
-        ], className="row"),
-    ], className="content"),
-    dcc.Link('DASHBOARD  INVENTAIRES', href='/') # Lien vers la page 1
-])
-
-# Callback pour afficher la page correspondante en fonction de l'URL
-@app.callback(Output('page-content', 'children'),
-              [Input('url', 'pathname')])
-def display_page(pathname):
-    if pathname == '/':
-        return page_1_layout
-    elif pathname == '/page-2':
-        return page_2_layout
-    else:
-        return 'Page introuvable'
-    
+    dcc.Interval(id='interval-component', interval=1000, n_intervals=0),  # Rafraîchissement toutes les secondes
+], className='content-wrapper', style={'margin-left': '0px', 'min-height': '100vh'})
 
 @app.callback(
     Output('sous-categorie-dropdown', 'options'),
@@ -2347,7 +2272,7 @@ def update_sous_categorie_dropdown(selected_categories):
     if selected_categories is None:
         return []
     
-    filtered_df = df[df['Catégorie'].isin(selected_categories)]
+    filtered_df = ddff[ddff['Catégorie'].isin(selected_categories)]
     sous_categorie_options = [{'label': sous_categorie, 'value': sous_categorie} for sous_categorie in filtered_df['Sous-catégorie'].unique()]
     return sous_categorie_options
 

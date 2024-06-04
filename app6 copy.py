@@ -108,7 +108,7 @@ new_excel_file = "Analyse_Globale.xlsx"
 
 merged_df.to_excel(new_excel_file, index=False)
 
-print(f"Données de la feuille '{sheet_name}' traitées et enregistrées dans '{new_excel_file}'.")
+#print(f"Données de la feuille '{sheet_name}' traitées et enregistrées dans '{new_excel_file}'.")
 
 
 ###################################################  4  #######################################################################
@@ -142,7 +142,7 @@ df_filtered["Date "] = pd.to_datetime(df_filtered["Date "], format="%Y-%m-%d %H:
 new_filtered_excel_file = "ChargePersonnel.xlsx"
 df_filtered.to_excel(new_filtered_excel_file, index=False)
 
-print(f"Données filtrées enregistrées dans '{new_filtered_excel_file}'.")
+#print(f"Données filtrées enregistrées dans '{new_filtered_excel_file}'.")
 #df_filtered
 
 merged = merged_df.merge(df_filtered[["Date ", "RH"]], on="Date ", how="left")
@@ -156,7 +156,7 @@ merged
 new_filtered_excel_file = "DétailsDépenses.xlsx"
 merged.to_excel(new_filtered_excel_file, index=False)
 
-print(f"Données consolidées et enregistrées dans '{new_filtered_excel_file}'.")
+#print(f"Données consolidées et enregistrées dans '{new_filtered_excel_file}'.")
 #df_filtered
 
 #merged
@@ -306,7 +306,7 @@ df0["MARKETING_ADMIN"] = df0[col1].sum(axis=1)
 # Convertir la colonne 'Date' en type datetime
 df0['Date '] = pd.to_datetime(df0['Date '])
 
-# Extraire le mois et l'année à partir de la colonne 'Date'
+# Extraire le mois et l'Années à partir de la colonne 'Date'
 df0['Mois'] = df0['Date '].dt.to_period('M')
 
 # Liste des colonnes pour le TCD
@@ -333,7 +333,7 @@ tcd["Profitabilité"] = round((tcd["Resultat net"])/(tcd["CA"]),2)
 new_filtered_excel_file = r"non.xlsx"
 tcd.to_excel(new_filtered_excel_file, index=True)
 
-print(f"Données consolidées et enregistrées dans '{new_filtered_excel_file}'.")
+#print(f"Données consolidées et enregistrées dans '{new_filtered_excel_file}'.")
 
 
 input_directory = r'input'
@@ -362,7 +362,7 @@ else:
 consolidated_df = pd.concat(data_frames, ignore_index=True)
 
 # Vous pouvez continuer à utiliser consolidated_df comme vous le souhaitez
-print(consolidated_df.head())
+#print(consolidated_df.head())
 
 
 # Définition du dictionnaire de correspondance des mois anglais et français
@@ -391,11 +391,11 @@ month_translation = {
 # Renommer les colonnes existantes
 consolidated_df.rename(columns={"Type": "Catégorie", "Categorie": "Sous-catégorie", "Produits": "Item", "TTC": "Total TTC"}, inplace=True)
 
-# Diviser la colonne "Date" en "Mois" et "Année"
+# Diviser la colonne "Date" en "Mois" et "Années"
 consolidated_df["Date"] = pd.to_datetime(consolidated_df["Date"])
 consolidated_df["Mois"] = consolidated_df["Date"].dt.strftime("%B").map(month_translation)
 
-# Ajouter la colonne Année
+# Ajouter la colonne Années
 consolidated_df["Années"] = consolidated_df["Date"].dt.year
 
 
@@ -468,15 +468,15 @@ inventaire2_df.to_excel(output_path, index=False)
 
 
 
-# Obtenir la liste des années uniques dans la colonne 'Année'
+# Obtenir la liste des Années uniques dans la colonne 'Années'
 #######annee_list = df['Années'].unique()
 #annee_list = df['Années'].astype(int).unique()
 
 
-# Obtenir la liste des années uniques dans la colonne 'Année'
+# Obtenir la liste des Années uniques dans la colonne 'Années'
 ######categorie_list = df['Catégorie'].unique()
 
-# Obtenir la liste des années uniques dans la colonne 'Année'
+# Obtenir la liste des Années uniques dans la colonne 'Années'
 #######sous_categorie_list = df['Sous-catégorie'].unique()
 
 
@@ -533,7 +533,7 @@ from plotly.subplots import make_subplots
 U = Path("Flux horaire/consolidate/Flux horaire.xlsx")
 dfl = pd.read_excel(U)
 
-def create_sales_dashboard(dfl):
+def create_sales_dashboard(dfl,annee_list):
     # Création des subplots
     fig = make_subplots(rows=2, cols=2, 
         subplot_titles=("Chiffre d'Affaires par Heure", "Nombre de Ventes par Heure",
@@ -547,7 +547,7 @@ def create_sales_dashboard(dfl):
         #fig.add_trace(go.Scatter(x=df_mois["Heure"], y=df_mois["Vendeurs"], mode="lines+markers", name=f"Vendeurs - {mois}"), row=2, col=1)
         fig.add_trace(go.Scatter(x=df_mois["Heure"], y=df_mois["Panier Moyen"], mode="lines+markers", name=f"Panier Moyen - {mois}"), row=1, col=2)
 
-    # Création des boutons pour filtrer par mois et par année
+    # Création des boutons pour filtrer par mois et par Années
     mois_buttons = [
         dict(label="Tous les mois",
              method="update",
@@ -566,7 +566,7 @@ def create_sales_dashboard(dfl):
         dict(label=str(annee),
              method="update",
              args=[{"visible": [trace.name.endswith(str(annee)) for trace in fig.data]}, {"title": f"Données de {annee}"}])
-        for annee in dfl['Année'].unique()
+        for annee in annee_list
     ]
 
     fig.update_layout(
@@ -574,7 +574,7 @@ def create_sales_dashboard(dfl):
             dict(buttons=mois_buttons, direction="down", x=0.1, xanchor="left", y=1.15, yanchor="top"),
             dict(buttons=annee_buttons, direction="down", x=0.3, xanchor="left", y=1.15, yanchor="top")
         ],
-        title="",#Analyse des Performances de Vente par Heure, Mois et Année
+        title="",#Analyse des Performances de Vente par Heure, Mois et Années
         height=700
     )
 
@@ -619,7 +619,7 @@ output_path = os.path.join(output_directory, output_file)
 # Enregistrer le DataFrame filtré dans un fichier Excel
 filtered_dif.to_excel(output_path, index=False)
 
-print(f"Le fichier a été enregistré avec succès sous : {output_path}")
+#print(f"Le fichier a été enregistré avec succès sous : {output_path}")
 
 
 
@@ -643,7 +643,7 @@ dif['CACHETS_DRINK'] = dif['CACHETS']*(40/100)
 dif['CACHETS_SMOKE'] = dif['CACHETS']**(20/100) 
 
 
-# Extraction du mois et de l'année à partir de la colonne 'Date '
+# Extraction du mois et de l'Années à partir de la colonne 'Date '
 dif['Mois'] = pd.to_datetime(dif['Date ']).dt.strftime('%B')
 dif['Années'] = pd.to_datetime(dif['Date ']).dt.year
 dif = dif
@@ -688,7 +688,7 @@ df_final['Catégorie'] = df_final['Catégories_Coûts'].map(category_mapping)
 # Supprimer la colonne 'Catégories_Coûts'
 df_final.drop('Catégories_Coûts', axis=1, inplace=True)
 
-# Triez par mois et années pour l'ordre chronologique
+# Triez par mois et Années pour l'ordre chronologique
 df_final.sort_values(by=['Années', 'Mois'], inplace=True)
 
 # Préparation du chemin de sortie
@@ -700,7 +700,7 @@ output_file_path = output_directory / output_file_name
 # Sauvegarder le résultat dans un nouveau fichier Excel
 df_final.to_excel(output_file_path, index=False)
 
-print(f"Le récapitulatif a été sauvegardé à {output_file_path}")
+#print(f"Le récapitulatif a été sauvegardé à {output_file_path}")
 
 #################################################""""""""""""""############################################################
 # Remplacer par les chemins réels de vos fichiers
@@ -758,9 +758,9 @@ for alloc in allocations:
     for i, cat in enumerate(categories):
         atch[f'{alloc}_{cat}'] = atch[alloc] * allocations[alloc][i]
 
-# Convertir les dates en mois et années séparés
+# Convertir les dates en mois et Années séparés
 atch['Mois'] = pd.to_datetime(atch['Date ']).dt.month.apply(lambda x: month_name[x].capitalize())
-atch['Année'] = pd.to_datetime(atch['Date ']).dt.year
+atch['Années'] = pd.to_datetime(atch['Date ']).dt.year
 
 # Traduire les mois en français
 months_translation = {
@@ -776,7 +776,7 @@ final_rows = []
 for i, row in atch.iterrows():
     for cat in categories:
         new_row = {
-            'Année': row['Année'],
+            'Années': row['Années'],
             'Mois': row['Mois'],
             'MARKETING_ADMIN': row[f'MARKETING_ADMIN_{cat}'],
             'CACHETS': row[f'CACHETS_{cat}'],
@@ -791,17 +791,17 @@ for i, row in atch.iterrows():
 # Transformer en DataFrame
 final_dfu = pd.DataFrame(final_rows)
 
-# Effectuer un groupby sur 'Année', 'Mois' et 'Catégorie'
-grouped_dfu = final_dfu.groupby(['Année', 'Mois', 'Catégorie']).sum().reset_index()
+# Effectuer un groupby sur 'Années', 'Mois' et 'Catégorie'
+grouped_dfu = final_dfu.groupby(['Années', 'Mois', 'Catégorie']).sum().reset_index()
 
-# Trier le DataFrame groupé par Année et Mois
-grouped_dfu.sort_values(by=['Année', 'Mois'], inplace=True)
+# Trier le DataFrame groupé par Années et Mois
+grouped_dfu.sort_values(by=['Années', 'Mois'], inplace=True)
 
 # Enregistrer le DataFrame groupé
 final_file_path = destination_directory / 'Grouped_Final_Details.xlsx'
 grouped_dfu.to_excel(final_file_path, index=False)
 
-print(f"Le fichier groupé a été enregistré avec succès sous : {final_file_path}")
+#print(f"Le fichier groupé a été enregistré avec succès sous : {final_file_path}")
 
 
 
@@ -816,19 +816,19 @@ grouped_df = pd.read_excel(grouped_details_path)
 result_fusion_df = pd.read_excel(result_fusion_path)
 
 # Renommer les colonnes pour uniformiser les noms
-result_fusion_df.rename(columns={'Années': 'Année'}, inplace=True)
+result_fusion_df.rename(columns={'Années': 'Années'}, inplace=True)
 
 # Assurez-vous que le format des mois est le même dans les deux DataFrames
 # Si nécessaire, mappez les noms des mois en français pour 'result_fusion_df'
 
-# Fusionner les DataFrames sur les colonnes 'Année', 'Mois', et 'Catégorie'
-combined_df = pd.merge(grouped_df, result_fusion_df, on=['Année', 'Mois', 'Catégorie'], how='outer')
+# Fusionner les DataFrames sur les colonnes 'Années', 'Mois', et 'Catégorie'
+combined_df = pd.merge(grouped_df, result_fusion_df, on=['Années', 'Mois', 'Catégorie'], how='outer')
 
 # Enregistrer le DataFrame combiné dans un nouveau fichier Excel
 combined_file_path = Path("inputcons/Combined_Details.xlsx")
 combined_df.to_excel(combined_file_path, index=False)
 
-print(f"Le fichier combiné a été enregistré avec succès sous : {combined_file_path}")
+#print(f"Le fichier combiné a été enregistré avec succès sous : {combined_file_path}")
 
 
 #################################################""""""""""""""############################################################
@@ -871,8 +871,8 @@ months = {
 }
 walla['Mois'] = walla['Mois'].map(months)
 
-# Trier les données par Année, Mois et Catégorie
-walla.sort_values(by=['Année', 'Mois', 'Catégorie'], inplace=True)
+# Trier les données par Années, Mois et Catégorie
+walla.sort_values(by=['Années', 'Mois', 'Catégorie'], inplace=True)
 
 # Calculer la variation mensuelle pour chaque catégorie
 # Créer un groupe pour chaque catégorie
@@ -883,9 +883,9 @@ result = pd.DataFrame()
 
 for name, group in grouped:
     # Calculer la variation pour le groupe actuel
-    group = group.sort_values(by=['Année', 'Mois'])
+    group = group.sort_values(by=['Années', 'Mois'])
     for column in group.select_dtypes(include=['number']).columns:
-        if 'Année' not in column and 'Mois' not in column:  # Ignorer les colonnes Année et Mois pour le calcul
+        if 'Années' not in column and 'Mois' not in column:  # Ignorer les colonnes Années et Mois pour le calcul
             # Calculer la variation en pourcentage et remplacer inf par 0
             group[f'var_{column}'] = (group[column].pct_change().replace([float('inf'), -float('inf'), float('nan')], 0) * 100).apply(lambda x: f"{x:.1f}%")
     #group[f'var_{column}'].apply(lambda x: f"{x:.2f}%")
@@ -903,14 +903,14 @@ output_file_path = Path("inputcons/Variations_Combined_Details.xlsx")
 result.to_excel(output_file_path, index=False)
 
 
-print(f"Les calculs ont été effectués avec succès et enregistrés dans {excel_file_path}")
+#print(f"Les calculs ont été effectués avec succès et enregistrés dans {excel_file_path}")
 
 # Chemin complet vers le fichier source
 file_path = Path("inputcons/Variations_Combined_Details.xlsx")#r"Variations_Combined_Details.xlsx"
 
 # Lire les données du fichier Excel dans un DataFrame pandas
-#df = pd.read_excel(file_path)
-#print(df)
+df2 = pd.read_excel(file_path)
+#print(df2)
 #####################################################SECONDE PARTIE#############################################################
 
 # Chargement des données à partir du fichier Excel
@@ -939,17 +939,17 @@ mois_list = sorted(df['Mois'].unique())
 
 
 
-# Obtenir la liste des années uniques dans la colonne 'Année'
+# Obtenir la liste des Années uniques dans la colonne 'Années'
 annee_list = df['Années'].unique()
 #annee_list = df['Années'].astype(int).unique()
 
 
-# Obtenir la liste des années uniques dans la colonne 'Année'
+# Obtenir la liste des Années uniques dans la colonne 'Années'
 categorie_list = df['Catégorie'].unique()
 
 #df = pd.read_excel(output_path)
-print(df.head())
-# Obtenir la liste des années uniques dans la colonne 'Année'
+#print(df.head())
+# Obtenir la liste des Années uniques dans la colonne 'Années'
 sous_categorie_list = df['Sous-catégorie'].unique()
 
 
@@ -1564,7 +1564,7 @@ def generate_bar_chart_revenue_by_month(df):
 
 ##################################################################### new graph #######################################################
 # Charger les données depuis le fichier Excel
-file_path = "inputcons/Combined_Details.xlsx"
+file_path =  "inputcons/Variations_Combined_Details.xlsx" #"inputcons/Combined_Details.xlsx"
 graph = pd.read_excel(file_path)
 
 categories = ['DRINK', 'EAT', 'SMOKE']
@@ -1731,9 +1731,9 @@ def generate_combined_bar_chart3(file_path, categories):
 
 #################################################################################################################################################
 
-def generate_eat_graph(graph):
+def generate_eat_graph(filtered_df):
     # Filtrer les données pour la catégorie EAT
-    eat_data = graph[graph['Catégorie'] == 'EAT'].copy()
+    eat_data = filtered_df[filtered_df['Catégorie'] == 'EAT'].copy()
 
     # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
@@ -1783,9 +1783,9 @@ def generate_eat_graph(graph):
 
 
 #############################################################################################################################""""""
-def generate_drink_graph(graph):
+def generate_drink_graph(filtered_df):
     # Filtrer les données pour la catégorie DRINK
-    drink_data = graph[graph['Catégorie'] == 'DRINK'].copy()
+    drink_data = filtered_df[filtered_df['Catégorie'] == 'DRINK'].copy()
 
     # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
@@ -1839,9 +1839,9 @@ def generate_drink_graph(graph):
 
 # Charger les données depuis le fichier Excel
 
-def generate_smoke_graph(graph):
+def generate_smoke_graph(filtered_df):
     # Filtrer les données pour la catégorie EAT
-    smoke_data = graph[graph['Catégorie'] == 'SMOKE'].copy()  # Utiliser .copy() pour éviter le avertissement
+    smoke_data = filtered_df[filtered_df['Catégorie'] == 'SMOKE'].copy()  # Utiliser .copy() pour éviter le avertissement
 
     # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
@@ -1889,9 +1889,9 @@ def generate_smoke_graph(graph):
 
 #############################################################################################################################################
 
-def generat_eat_graph(graph):
+def generat_eat_graph(filtered_df):
     # Filtrer les données pour la catégorie EAT ['Taux Marge brute', 'Rentabilite']
-    eat_data = graph[graph['Catégorie'] == 'EAT'].copy()  # Utiliser .copy() pour éviter le avertissement
+    eat_data = filtered_df[filtered_df['Catégorie'] == 'EAT'].copy()  # Utiliser .copy() pour éviter le avertissement
 
     # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
@@ -1939,9 +1939,9 @@ def generat_eat_graph(graph):
     return fig
 #############################################################################################################################""""""
 
-def generat_drink_graph(graph):
+def generat_drink_graph(filtered_df):
     # Filtrer les données pour la catégorie DRINK
-    drink_data = graph[graph['Catégorie'] == 'DRINK'].copy()  # Utiliser .copy() pour éviter le avertissement
+    drink_data = filtered_df[filtered_df['Catégorie'] == 'DRINK'].copy()  # Utiliser .copy() pour éviter le avertissement
 
     # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
@@ -1988,9 +1988,9 @@ def generat_drink_graph(graph):
     return fig
 #################################################################################################################################
 
-def generat_smoke_graph(graph):
+def generat_smoke_graph(filtered_df):
     # Filtrer les données pour la catégorie EAT
-    smoke_data = graph[graph['Catégorie'] == 'SMOKE'].copy()  # Utiliser .copy() pour éviter le avertissement
+    smoke_data = filtered_df[filtered_df['Catégorie'] == 'SMOKE'].copy()  # Utiliser .copy() pour éviter le avertissement
 
     # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
@@ -2037,9 +2037,9 @@ def generat_smoke_graph(graph):
     return fig
 #############################################################################################################################################
 
-def genera_eat_graph(graph):
+def genera_eat_graph(filtered_df):
     # Filtrer les données pour la catégorie EAT Taux Opex
-    eat_data = graph[graph['Catégorie'] == 'EAT'].copy()  # Utiliser .copy() pour éviter le avertissement
+    eat_data = filtered_df[filtered_df['Catégorie'] == 'EAT'].copy()  # Utiliser .copy() pour éviter le avertissement
 
     # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
@@ -2087,9 +2087,9 @@ def genera_eat_graph(graph):
     return fig
 #############################################################################################################################""""""
 
-def genera_drink_graph(graph):
+def genera_drink_graph(filtered_df):
     # Filtrer les données pour la catégorie DRINK
-    drink_data = graph[graph['Catégorie'] == 'DRINK'].copy()  # Utiliser .copy() pour éviter le avertissement
+    drink_data = filtered_df[filtered_df['Catégorie'] == 'DRINK'].copy()  # Utiliser .copy() pour éviter le avertissement
 
     # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
@@ -2136,9 +2136,9 @@ def genera_drink_graph(graph):
     return fig
 #################################################################################################################################
 
-def genera_smoke_graph(graph):
+def genera_smoke_graph(filtered_df):
     # Filtrer les données pour la catégorie EAT
-    smoke_data = graph[graph['Catégorie'] == 'SMOKE'].copy()  # Utiliser .copy() pour éviter le avertissement
+    smoke_data = filtered_df[filtered_df['Catégorie'] == 'SMOKE'].copy()  # Utiliser .copy() pour éviter le avertissement
 
     # Définir l'ordre des mois
     ordered_months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
@@ -2183,6 +2183,896 @@ def genera_smoke_graph(graph):
     fig.update_traces(textposition='inside', textfont=dict(color='white'))
 
     return fig
+
+
+#######################""####################2024~~~~~~~~~~~~####################################################
+###### EVOLUTION DU CA ET MARGE BRUTE PAR CATEGORIES ##########################################3
+def generate_chart_for_category_eat(filtered_df):
+    # Mapper les noms des mois à des numéros pour le tri
+    month_to_num = {
+        'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5, 'Juin': 6,
+        'Juillet': 7, 'Août': 8, 'Septembre': 9, 'Octobre': 10, 'Novembre': 11, 'Décembre': 12
+    }
+
+    # Ajouter une colonne de mois numérique pour le tri
+    filtered_df['MoisNum'] = filtered_df['Mois'].map(month_to_num)
+
+    # Filtrer pour la catégorie "EAT" et grouper par mois numérique, puis trier
+    df_eat = filtered_df[filtered_df['Catégorie'] == 'EAT'].groupby('MoisNum', as_index=False).agg({
+        'Mois': 'first',  # Garder le nom du mois
+        'CA': 'sum',  # Somme du Chiffre d'Affaires
+        'Marge brute': 'sum'  # Somme de la Marge brute
+    }).sort_values('MoisNum')  # Trier par le numéro du mois
+
+    # Créer la figure pour la Marge brute et le Chiffre d'affaires
+    fig = go.Figure()
+
+    # Ajouter les barres pour le chiffre d'affaires de la catégorie "EAT"
+    fig.add_trace(
+        go.Bar(x=df_eat['Mois'], y=df_eat['CA'], name='Chiffre d\'affaires', marker_color='blue')
+    )
+
+    # Ajouter la ligne pour l'évolution de la marge brute de la catégorie "EAT"
+    fig.add_trace(
+        go.Scatter(x=df_eat['Mois'], y=df_eat['Marge brute'], name='Évolution de la Marge brute', yaxis='y2', marker_color='orange')
+    )
+
+    # Mise à jour des axes y et y2 pour le positionnement et le formatage
+    fig.update_layout(
+        yaxis=dict(
+            title='Chiffre d\'affaires',
+            titlefont=dict(color='blue'),
+            tickfont=dict(color='blue')
+        ),
+        yaxis2=dict(
+            title='Marge brute',
+            titlefont=dict(color='orange'),
+            tickfont=dict(color='orange'),
+            overlaying='y',
+            side='right',
+        ),
+        #title='Évolution de la Marge brute et du Chiffre d\'affaires par mois pour la catégorie "EAT"',
+        xaxis=dict(title='Mois'),
+        #legend=dict(x=0.01, y=0.99, orientation='h')
+        legend=dict(
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        )
+    )
+
+     # Ajouter des étiquettes de texte pour les points sur le tracé de la ligne de marge brute
+    for i, value in enumerate(df_eat['Marge brute']):
+        fig.add_annotation(
+            x=df_eat['Mois'][i],
+            y=value,
+            text=f"{value:,}",
+            showarrow=False,
+            font=dict(color='red'),
+        )
+
+    for i, value in enumerate(df_eat['CA']):
+        fig.add_annotation(
+            x=df_eat['Mois'][i],
+            y=value,
+            text=f"{value:,}",
+            showarrow=False,
+            font=dict(color='white'),
+        )    
+    # Mettre les étiquettes de données en blanc et sans chiffre après la virgule
+    #fig.update_traces(textposition='inside', textfont=dict(color='white'))
+    # Supprimer la colonne temporaire MoisNum si nécessaire
+    # filtered_df.drop('MoisNum', axis=1, inplace=True)
+
+    # Renvoyer la figure pour affichage
+    return fig
+
+# Usage:
+
+
+def generate_chart_for_category_drink(filtered_df):
+    # Mapper les noms des mois à des numéros pour le tri
+    month_to_num = {
+        'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5, 'Juin': 6,
+        'Juillet': 7, 'Août': 8, 'Septembre': 9, 'Octobre': 10, 'Novembre': 11, 'Décembre': 12
+    }
+
+    # Ajouter une colonne de mois numérique pour le tri
+    filtered_df['MoisNum'] = filtered_df['Mois'].map(month_to_num)
+
+    # Filtrer pour la catégorie "EAT" et grouper par mois numérique, puis trier
+    df_eat = filtered_df[filtered_df['Catégorie'] == 'DRINK'].groupby('MoisNum', as_index=False).agg({
+        'Mois': 'first',  # Garder le nom du mois
+        'CA': 'sum',  # Somme du Chiffre d'Affaires
+        'Marge brute': 'sum'  # Somme de la Marge brute
+    }).sort_values('MoisNum')  # Trier par le numéro du mois
+
+    # Créer la figure pour la Marge brute et le Chiffre d'affaires
+    fig = go.Figure()
+
+    # Ajouter les barres pour le chiffre d'affaires de la catégorie "EAT"
+    fig.add_trace(
+        go.Bar(x=df_eat['Mois'], y=df_eat['CA'], name='Chiffre d\'affaires', marker_color='green')
+    )
+
+    # Ajouter la ligne pour l'évolution de la marge brute de la catégorie "EAT"
+    fig.add_trace(
+        go.Scatter(x=df_eat['Mois'], y=df_eat['Marge brute'], name='Évolution de la Marge brute', yaxis='y2', marker_color='orange')
+    )
+
+    # Mise à jour des axes y et y2 pour le positionnement et le formatage
+    fig.update_layout(
+        yaxis=dict(
+            title='Chiffre d\'affaires',
+            titlefont=dict(color='blue'),
+            tickfont=dict(color='blue')
+        ),
+        yaxis2=dict(
+            title='Marge brute',
+            titlefont=dict(color='orange'),
+            tickfont=dict(color='orange'),
+            overlaying='y',
+            side='right',
+        ),
+        #title='Évolution de la Marge brute et du Chiffre d\'affaires par mois pour la catégorie "EAT"',
+        xaxis=dict(title='Mois'),
+        #legend=dict(x=0.01, y=0.99, orientation='h')
+        legend=dict(
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        )
+    )
+
+     # Ajouter des étiquettes de texte pour les points sur le tracé de la ligne de marge brute
+    for i, value in enumerate(df_eat['Marge brute']):
+        fig.add_annotation(
+            x=df_eat['Mois'][i],
+            y=value,
+            text=f"{value:,}",
+            showarrow=False,
+            font=dict(color='red'),
+        )
+
+    for i, value in enumerate(df_eat['CA']):
+        fig.add_annotation(
+            x=df_eat['Mois'][i],
+            y=value,
+            text=f"{value:,}",
+            showarrow=False,
+            font=dict(color='white'),
+        )    
+    # Mettre les étiquettes de données en blanc et sans chiffre après la virgule
+    #fig.update_traces(textposition='inside', textfont=dict(color='white'))
+    # Supprimer la colonne temporaire MoisNum si nécessaire
+    # filtered_df.drop('MoisNum', axis=1, inplace=True)
+
+    # Renvoyer la figure pour affichage
+    return fig
+
+
+
+def generate_chart_for_category_smoke(filtered_df):
+    # Mapper les noms des mois à des numéros pour le tri
+    month_to_num = {
+        'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5, 'Juin': 6,
+        'Juillet': 7, 'Août': 8, 'Septembre': 9, 'Octobre': 10, 'Novembre': 11, 'Décembre': 12
+    }
+
+    # Ajouter une colonne de mois numérique pour le tri
+    filtered_df['MoisNum'] = filtered_df['Mois'].map(month_to_num)
+
+    # Filtrer pour la catégorie "EAT" et grouper par mois numérique, puis trier
+    df_eat = filtered_df[filtered_df['Catégorie'] == 'SMOKE'].groupby('MoisNum', as_index=False).agg({
+        'Mois': 'first',  # Garder le nom du mois
+        'CA': 'sum',  # Somme du Chiffre d'Affaires
+        'Marge brute': 'sum'  # Somme de la Marge brute
+    }).sort_values('MoisNum')  # Trier par le numéro du mois
+
+    # Créer la figure pour la Marge brute et le Chiffre d'affaires
+    fig = go.Figure()
+
+    # Ajouter les barres pour le chiffre d'affaires de la catégorie "EAT"
+    fig.add_trace(
+        go.Bar(x=df_eat['Mois'], y=df_eat['CA'], name='Chiffre d\'affaires', marker_color='purple')
+    )
+
+    # Ajouter la ligne pour l'évolution de la marge brute de la catégorie "EAT"
+    fig.add_trace(
+        go.Scatter(x=df_eat['Mois'], y=df_eat['Marge brute'], name='Évolution de la Marge brute', yaxis='y2', marker_color='orange')
+    )
+
+    # Mise à jour des axes y et y2 pour le positionnement et le formatage
+    fig.update_layout(
+        yaxis=dict(
+            title='Chiffre d\'affaires',
+            titlefont=dict(color='blue'),
+            tickfont=dict(color='blue')
+        ),
+        yaxis2=dict(
+            title='Marge brute',
+            titlefont=dict(color='orange'),
+            tickfont=dict(color='orange'),
+            overlaying='y',
+            side='right',
+        ),
+        #title='Évolution de la Marge brute et du Chiffre d\'affaires par mois pour la catégorie "EAT"',
+        xaxis=dict(title='Mois'),
+        #legend=dict(x=0.01, y=0.99, orientation='h')
+        legend=dict(
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        )
+    )
+
+     # Ajouter des étiquettes de texte pour les points sur le tracé de la ligne de marge brute
+    for i, value in enumerate(df_eat['Marge brute']):
+        fig.add_annotation(
+            x=df_eat['Mois'][i],
+            y=value,
+            text=f"{value:,}",
+            showarrow=False,
+            font=dict(color='red'),
+        )
+
+    for i, value in enumerate(df_eat['CA']):
+        fig.add_annotation(
+            x=df_eat['Mois'][i],
+            y=value,
+            text=f"{value:,}",
+            showarrow=False,
+            font=dict(color='white'),
+        )    
+    # Mettre les étiquettes de données en blanc et sans chiffre après la virgule
+    #fig.update_traces(textposition='inside', textfont=dict(color='white'))
+    # Supprimer la colonne temporaire MoisNum si nécessaire
+    # filtered_df.drop('MoisNum', axis=1, inplace=True)
+
+    # Renvoyer la figure pour affichage
+    return fig
+
+
+
+###### EVOLUTION DU CA ET RENTABILITE PAR CATEGORIES ##########################################3
+def generate_rentabilite_eat(filtered_df):
+    
+    
+    # Mapper les noms des mois à des numéros pour le tri
+    month_to_num = {
+        'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5, 'Juin': 6,
+        'Juillet': 7, 'Août': 8, 'Septembre': 9, 'Octobre': 10, 'Novembre': 11, 'Décembre': 12
+    }
+
+    # Ajouter une colonne de mois numérique pour le tri
+    filtered_df['MoisNum'] = filtered_df['Mois'].map(month_to_num)
+
+    # Filtrer pour la catégorie "EAT" et grouper par mois numérique, puis trier
+    df_eat = filtered_df[filtered_df['Catégorie'] == 'EAT'].groupby('MoisNum', as_index=False).agg({
+        'Mois': 'first',  # Garder le nom du mois
+        'CA': 'sum',  # Somme du Chiffre d'Affaires
+        'Rentabilite': 'sum'  # Somme de la Rentabilite
+    }).sort_values('MoisNum')  # Trier par le numéro du mois
+    
+    
+    # Convertir les colonnes 'Rentabilite' et 'CA' en nombres flottants
+    df_eat['Rentabilite'] = pd.to_numeric(df_eat['Rentabilite'].str.replace('%', ''), errors='coerce')
+    df_eat['CA'] = pd.to_numeric(df_eat['CA'], errors='coerce')
+
+    # Créer la figure pour la Marge brute et le Chiffre d'affaires
+    fig = go.Figure()
+
+    # Ajouter les barres pour le chiffre d'affaires de la catégorie "EAT"
+    fig.add_trace(
+        go.Bar(x=df_eat['Mois'], y=df_eat['CA'], name='Chiffre d\'affaires', marker_color='blue')
+    )
+
+    # Ajouter la ligne pour l'évolution de la marge brute de la catégorie "EAT"
+    fig.add_trace(
+        go.Scatter(x=df_eat['Mois'], y=df_eat['Rentabilite'], name='Évolution de la Rentabilite', yaxis='y2', marker_color='orange')
+    )
+
+    # Mise à jour des axes y et y2 pour le positionnement et le formatage
+    fig.update_layout(
+        yaxis=dict(
+            title='Chiffre d\'affaires',
+            titlefont=dict(color='blue'),
+            tickfont=dict(color='blue')
+        ),
+        yaxis2=dict(
+            title='Rentabilite',
+            titlefont=dict(color='orange'),
+            tickfont=dict(color='orange'),
+            overlaying='y',
+            side='right',
+        ),
+        #title='Évolution de la Marge brute et du Chiffre d\'affaires par mois pour la catégorie "EAT"',
+        xaxis=dict(title='Mois'),
+        #legend=dict(x=0.01, y=0.99, orientation='h')
+        legend=dict(
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        )
+    )
+
+    # Ajouter des étiquettes de texte pour les points sur le tracé de la ligne de rentabilité
+    for i, value in enumerate(df_eat['Rentabilite']):
+        fig.add_annotation(
+            x=df_eat['Mois'][i],
+            y=value,
+            text=f"{value:,.2f}%",  # Format avec des séparateurs de milliers et deux décimales
+            showarrow=False,
+            font=dict(color='red'),
+        )
+
+    # Ajouter des étiquettes de texte pour les barres de chiffre d'affaires
+    for i, value in enumerate(df_eat['CA']):
+        fig.add_annotation(
+            x=df_eat['Mois'][i],
+            y=value,
+            text=f"{value:,.0f}",  # Format avec des séparateurs de milliers et zéro décimale
+            showarrow=False,
+            font=dict(color='white'),
+        )    
+  
+
+    # Renvoyer la figure pour affichage
+    return fig
+
+def generate_rentabilite_drink(filtered_df):
+    
+    
+    # Mapper les noms des mois à des numéros pour le tri
+    month_to_num = {
+        'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5, 'Juin': 6,
+        'Juillet': 7, 'Août': 8, 'Septembre': 9, 'Octobre': 10, 'Novembre': 11, 'Décembre': 12
+    }
+
+    # Ajouter une colonne de mois numérique pour le tri
+    filtered_df['MoisNum'] = filtered_df['Mois'].map(month_to_num)
+
+    # Filtrer pour la catégorie "EAT" et grouper par mois numérique, puis trier
+    df_eat = filtered_df[filtered_df['Catégorie'] == 'DRINK'].groupby('MoisNum', as_index=False).agg({
+        'Mois': 'first',  # Garder le nom du mois
+        'CA': 'sum',  # Somme du Chiffre d'Affaires
+        'Rentabilite': 'sum'  # Somme de la Rentabilite
+    }).sort_values('MoisNum')  # Trier par le numéro du mois
+    
+    
+    # Convertir les colonnes 'Rentabilite' et 'CA' en nombres flottants
+    df_eat['Rentabilite'] = pd.to_numeric(df_eat['Rentabilite'].str.replace('%', ''), errors='coerce')
+    df_eat['CA'] = pd.to_numeric(df_eat['CA'], errors='coerce')
+
+    # Créer la figure pour la Marge brute et le Chiffre d'affaires
+    fig = go.Figure()
+
+    # Ajouter les barres pour le chiffre d'affaires de la catégorie "EAT"
+    fig.add_trace(
+        go.Bar(x=df_eat['Mois'], y=df_eat['CA'], name='Chiffre d\'affaires', marker_color='green')
+    )
+
+    # Ajouter la ligne pour l'évolution de la marge brute de la catégorie "EAT"
+    fig.add_trace(
+        go.Scatter(x=df_eat['Mois'], y=df_eat['Rentabilite'], name='Évolution de la Rentabilite', yaxis='y2', marker_color='orange')
+    )
+
+    # Mise à jour des axes y et y2 pour le positionnement et le formatage
+    fig.update_layout(
+        yaxis=dict(
+            title='Chiffre d\'affaires',
+            titlefont=dict(color='blue'),
+            tickfont=dict(color='blue')
+        ),
+        yaxis2=dict(
+            title='Rentabilite',
+            titlefont=dict(color='orange'),
+            tickfont=dict(color='orange'),
+            overlaying='y',
+            side='right',
+        ),
+        #title='Évolution de la Marge brute et du Chiffre d\'affaires par mois pour la catégorie "EAT"',
+        xaxis=dict(title='Mois'),
+        #legend=dict(x=0.01, y=0.99, orientation='h')
+        legend=dict(
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        )
+    )
+
+    # Ajouter des étiquettes de texte pour les points sur le tracé de la ligne de rentabilité
+    for i, value in enumerate(df_eat['Rentabilite']):
+        fig.add_annotation(
+            x=df_eat['Mois'][i],
+            y=value,
+            text=f"{value:,.2f}%",  # Format avec des séparateurs de milliers et deux décimales
+            showarrow=False,
+            font=dict(color='red'),
+        )
+
+    # Ajouter des étiquettes de texte pour les barres de chiffre d'affaires
+    for i, value in enumerate(df_eat['CA']):
+        fig.add_annotation(
+            x=df_eat['Mois'][i],
+            y=value,
+            text=f"{value:,.0f}",  # Format avec des séparateurs de milliers et zéro décimale
+            showarrow=False,
+            font=dict(color='white'),
+        )    
+  
+
+    # Renvoyer la figure pour affichage
+    return fig
+
+
+def generate_rentabilite_smoke(filtered_df):
+    
+    
+    # Mapper les noms des mois à des numéros pour le tri
+    month_to_num = {
+        'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5, 'Juin': 6,
+        'Juillet': 7, 'Août': 8, 'Septembre': 9, 'Octobre': 10, 'Novembre': 11, 'Décembre': 12
+    }
+
+    # Ajouter une colonne de mois numérique pour le tri
+    filtered_df['MoisNum'] = filtered_df['Mois'].map(month_to_num)
+
+    # Filtrer pour la catégorie "EAT" et grouper par mois numérique, puis trier
+    df_eat = filtered_df[filtered_df['Catégorie'] == 'SMOKE'].groupby('MoisNum', as_index=False).agg({
+        'Mois': 'first',  # Garder le nom du mois
+        'CA': 'sum',  # Somme du Chiffre d'Affaires
+        'Rentabilite': 'sum'  # Somme de la Rentabilite
+    }).sort_values('MoisNum')  # Trier par le numéro du mois
+    
+    
+    # Convertir les colonnes 'Rentabilite' et 'CA' en nombres flottants
+    df_eat['Rentabilite'] = pd.to_numeric(df_eat['Rentabilite'].str.replace('%', ''), errors='coerce')
+    df_eat['CA'] = pd.to_numeric(df_eat['CA'], errors='coerce')
+
+    # Créer la figure pour la Marge brute et le Chiffre d'affaires
+    fig = go.Figure()
+
+    # Ajouter les barres pour le chiffre d'affaires de la catégorie "EAT"
+    fig.add_trace(
+        go.Bar(x=df_eat['Mois'], y=df_eat['CA'], name='Chiffre d\'affaires', marker_color='purple')
+    )
+
+    # Ajouter la ligne pour l'évolution de la marge brute de la catégorie "EAT"
+    fig.add_trace(
+        go.Scatter(x=df_eat['Mois'], y=df_eat['Rentabilite'], name='Évolution de la Rentabilite', yaxis='y2', marker_color='orange')
+    )
+
+    # Mise à jour des axes y et y2 pour le positionnement et le formatage
+    fig.update_layout(
+        yaxis=dict(
+            title='Chiffre d\'affaires',
+            titlefont=dict(color='blue'),
+            tickfont=dict(color='blue')
+        ),
+        yaxis2=dict(
+            title='Rentabilite',
+            titlefont=dict(color='orange'),
+            tickfont=dict(color='orange'),
+            overlaying='y',
+            side='right',
+        ),
+        #title='Évolution de la Marge brute et du Chiffre d\'affaires par mois pour la catégorie "EAT"',
+        xaxis=dict(title='Mois'),
+        #legend=dict(x=0.01, y=0.99, orientation='h')
+        legend=dict(
+            title_text='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        )
+    )
+
+    # Ajouter des étiquettes de texte pour les points sur le tracé de la ligne de rentabilité
+    for i, value in enumerate(df_eat['Rentabilite']):
+        fig.add_annotation(
+            x=df_eat['Mois'][i],
+            y=value,
+            text=f"{value:,.2f}%",  # Format avec des séparateurs de milliers et deux décimales
+            showarrow=False,
+            font=dict(color='red'),
+        )
+
+    # Ajouter des étiquettes de texte pour les barres de chiffre d'affaires
+    for i, value in enumerate(df_eat['CA']):
+        fig.add_annotation(
+            x=df_eat['Mois'][i],
+            y=value,
+            text=f"{value:,.0f}",  # Format avec des séparateurs de milliers et zéro décimale
+            showarrow=False,
+            font=dict(color='white'),
+        )    
+  
+
+    # Renvoyer la figure pour affichage
+    return fig
+
+###### Opex par catégories ##########################""
+def generate_opex_evolution_chart(filtered_df):
+    # Nettoyage des données et conversion en nombres décimaux
+    filtered_df['Taux Opex'] = pd.to_numeric(
+        filtered_df['Taux Opex'].str.replace('%', ''), errors='coerce')
+
+    # Gestion des valeurs NaN par remplacement par zéro
+    filtered_df['Taux Opex'].fillna(0, inplace=True)
+
+    # Réorganiser le DataFrame pour préparer le graphique empilé
+    pivot_df = filtered_df.pivot_table(index='Mois', columns='Catégorie', values='Taux Opex', aggfunc='first')
+
+    # Créer le graphique
+    fig = go.Figure()
+
+    # Trier selon l'ordre des mois
+    months_order = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    pivot_df = pivot_df.reindex(months_order)
+
+    # Ajouter les barres empilées pour chaque catégorie
+    for category in pivot_df.columns:
+        fig.add_trace(go.Bar(
+            name=category,
+            x=pivot_df.index,
+            y=pivot_df[category],
+            texttemplate='%{y:.2f}%',
+            textposition='inside'
+        ))
+
+    # Mise à jour de la disposition pour normaliser les barres à 100% et cacher l'axe des y
+    fig.update_layout(
+        barmode='stack',
+        barnorm='percent',
+        yaxis=dict(
+            title='Pourcentage du Taux Opex',
+            showticklabels=False,
+            showgrid=False,
+            visible=False  # Cache l'axe des y
+        ),
+        xaxis=dict(title='Mois'),
+        title='Évolution spécifique du Taux Opex',
+        legend_title_text='',
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+    )
+
+    # Appliquer les couleurs aux barres
+    fig.for_each_trace(lambda t: t.update(marker_color={
+        'DRINK': 'blue', 'EAT': 'red', 'SMOKE': 'green'}.get(t.name, 'grey')))
+
+    return fig
+
+
+
+def generate_opex_evolution_chart_changé(filtered_df):
+            
+    # Nettoyage des données et conversion en nombres décimaux
+    filtered_df['Taux Opex'] = pd.to_numeric(
+    filtered_df['Taux Opex'].str.replace('%', ''), errors='coerce')
+
+    # Gestion des valeurs NaN par remplacement par zéro
+    filtered_df['Taux Opex'].fillna(0, inplace=True)
+    
+    # Réorganiser le DataFrame pour préparer le graphique empilé
+    pivot_df = filtered_df.pivot_table(index='Mois', columns='Catégorie', values='Taux Opex', aggfunc='first')
+    
+    # Créer le graphique
+    fig = go.Figure()
+    
+    # Trier selon l'ordre des mois
+    months_order = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    pivot_df = pivot_df.reindex(months_order)
+
+    # Ajouter les barres empilées pour chaque catégorie
+    for category in pivot_df.columns:
+        fig.add_trace(go.Bar(
+            name=category,
+            x=pivot_df.index,
+            y=pivot_df[category],
+            texttemplate='%{y:.2f}%',
+            textposition='inside'
+        ))
+    
+    # Mise à jour de la disposition pour normaliser les barres à 100%
+    fig.update_layout(
+        barmode='stack',
+        barnorm='percent',
+        yaxis=dict(title='Pourcentage du Taux Opex', tickformat='%'),
+        xaxis=dict(title='Mois'),
+        #title='Évolution spécifique des Taux Opex',
+        legend_title_text='',
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        
+    )
+    
+    # Appliquer les couleurs aux barres
+    fig.for_each_trace(lambda t: t.update(marker_color={
+        'DRINK': 'blue', 'EAT': 'red', 'SMOKE': 'green'}.get(t.name, 'grey')))
+    
+    return fig
+
+########### Marge brute par catégories
+
+def generate_mb_evolution_chart(filtered_df):
+    # Nettoyage des données et conversion en nombres décimaux
+    filtered_df['Taux Marge brute'] = pd.to_numeric(
+        filtered_df['Taux Marge brute'].str.replace('%', ''), errors='coerce')
+
+    # Gestion des valeurs NaN par remplacement par zéro
+    filtered_df['Taux Marge brute'].fillna(0, inplace=True)
+
+    # Réorganiser le DataFrame pour préparer le graphique empilé
+    pivot_df = filtered_df.pivot_table(index='Mois', columns='Catégorie', values='Taux Marge brute', aggfunc='first')
+
+    # Créer le graphique
+    fig = go.Figure()
+
+    # Trier selon l'ordre des mois
+    months_order = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    pivot_df = pivot_df.reindex(months_order)
+
+    # Ajouter les barres empilées pour chaque catégorie
+    for category in pivot_df.columns:
+        fig.add_trace(go.Bar(
+            name=category,
+            x=pivot_df.index,
+            y=pivot_df[category],
+            texttemplate='%{y:.2f}%',
+            textposition='inside'
+        ))
+
+    # Mise à jour de la disposition pour normaliser les barres à 100% et cacher l'axe des y
+    fig.update_layout(
+        barmode='stack',
+        barnorm='percent',
+        yaxis=dict(
+            title='Pourcentage du Taux Marge brute',
+            showticklabels=False,
+            showgrid=False,
+            visible=False  # Cache l'axe des y
+        ),
+        xaxis=dict(title='Mois'),
+        title='',
+        legend_title_text='',
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+    )
+
+    # Appliquer les couleurs aux barres
+    fig.for_each_trace(lambda t: t.update(marker_color={
+        'DRINK': 'blue', 'EAT': 'red', 'SMOKE': 'green'}.get(t.name, 'grey')))
+
+    return fig
+
+
+def generate_mb_evolution_chart_changé(filtered_df):
+            
+    # Nettoyage des données et conversion en nombres décimaux
+    filtered_df['Taux Marge brute'] = pd.to_numeric(
+    filtered_df['Taux Marge brute'].str.replace('%', ''), errors='coerce')
+
+    # Gestion des valeurs NaN par remplacement par zéro
+    filtered_df['Taux Marge brute'].fillna(0, inplace=True)
+    
+    # Réorganiser le DataFrame pour préparer le graphique empilé
+    pivot_df = filtered_df.pivot_table(index='Mois', columns='Catégorie', values='Taux Marge brute', aggfunc='first')
+    
+    # Créer le graphique
+    fig = go.Figure()
+    
+    # Trier selon l'ordre des mois
+    months_order = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    pivot_df = pivot_df.reindex(months_order)
+
+    # Ajouter les barres empilées pour chaque catégorie
+    for category in pivot_df.columns:
+        fig.add_trace(go.Bar(
+            name=category,
+            x=pivot_df.index,
+            y=pivot_df[category],
+            texttemplate='%{y:.2f}%',
+            textposition='inside'
+        ))
+    
+    # Mise à jour de la disposition pour normaliser les barres à 100%
+    fig.update_layout(
+        barmode='stack',
+        barnorm='percent',
+        yaxis=dict(title='Pourcentage du Taux Marge brute', tickformat='%'),
+        xaxis=dict(title='Mois'),
+        #title='Évolution spécifique des Taux Opex',
+        legend_title_text='',
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        
+    )
+    
+    # Appliquer les couleurs aux barres
+    fig.for_each_trace(lambda t: t.update(marker_color={
+        'DRINK': 'blue', 'EAT': 'red', 'SMOKE': 'green'}.get(t.name, 'grey')))
+    
+    return fig
+
+
+def generate_rent_evolution_chart(filtered_df):
+            
+    # Nettoyage des données et conversion en nombres décimaux
+    filtered_df['Rentabilite'] = pd.to_numeric(
+    filtered_df['Rentabilite'].str.replace('%', ''), errors='coerce')
+
+    # Gestion des valeurs NaN par remplacement par zéro
+    filtered_df['Rentabilite'].fillna(0, inplace=True)
+    
+    # Réorganiser le DataFrame pour préparer le graphique empilé
+    pivot_df = filtered_df.pivot_table(index='Mois', columns='Catégorie', values='Rentabilite', aggfunc='first')
+    
+    # Créer le graphique
+    fig = go.Figure()
+    
+    # Trier selon l'ordre des mois
+    months_order = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    pivot_df = pivot_df.reindex(months_order)
+
+    # Ajouter les barres empilées pour chaque catégorie
+    for category in pivot_df.columns:
+        fig.add_trace(go.Bar(
+            name=category,
+            x=pivot_df.index,
+            y=pivot_df[category],
+            texttemplate='%{y:.2f}%',
+            textposition='inside'
+        ))
+    
+    # Mise à jour de la disposition pour normaliser les barres à 100%
+    fig.update_layout(
+        barmode='stack',
+        barnorm='percent',
+        yaxis=dict(title='Pourcentage de la Rentabilite', tickformat='%'),
+        xaxis=dict(title='Mois'),
+        #title='Évolution spécifique des Taux Opex',
+        legend_title_text='',
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        
+    )
+    
+    # Appliquer les couleurs aux barres
+    fig.for_each_trace(lambda t: t.update(marker_color={
+        'DRINK': 'blue', 'EAT': 'red', 'SMOKE': 'green'}.get(t.name, 'grey')))
+    
+    return fig
+
+
+
+def generate_rentability_evolution_chart(filtered_df):
+    # Assurez-vous que 'Rentabilite' est une chaîne de caractères et convertissez en décimal
+    filtered_df['Rentabilite'] = pd.to_numeric(
+        filtered_df['Rentabilite'].str.rstrip('%').astype(float) / 100, errors='coerce')
+    filtered_df['Rentabilite'].fillna(0, inplace=True)
+    
+    # Définir l'ordre correct des mois
+    months_order = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    # Convertir la colonne 'Mois' en type catégoriel avec l'ordre spécifié
+    filtered_df['Mois'] = pd.Categorical(filtered_df['Mois'], categories=months_order, ordered=True)
+    
+    # Trier le DataFrame par mois selon l'ordre des catégories
+    filtered_df.sort_values('Mois', inplace=True)
+
+    # Pivoter les données pour le graphique
+    pivot_df = filtered_df.pivot_table(index='Mois', columns='Catégorie', values='Rentabilite', aggfunc='mean')
+
+    # Créer le graphique
+    fig = go.Figure()
+    
+    # Ajouter les barres pour chaque catégorie
+    for category in pivot_df.columns:
+        fig.add_trace(go.Bar(
+            name=category,
+            x=pivot_df.index,
+            y=pivot_df[category],
+            text=pivot_df[category].apply(lambda x: f'{x:.1%}'),
+            textposition='inside'
+        ))
+    
+    # Mise à jour de la disposition du graphique
+    fig.update_layout(
+        barmode='relative',
+        yaxis=dict(
+            title='Pourcentage de Rentabilité',
+            tickformat='.0%',
+            range=[-1, 1]  # -100% à 100%
+        ),
+        xaxis=dict(title='Mois'),
+        title='Évolution spécifique de la Rentabilité',
+        legend_title_text='Catégorie',
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+    )
+
+    # Appliquer les couleurs
+    colors = {'DRINK': 'blue', 'EAT': 'red', 'SMOKE': 'green'}
+    fig.for_each_trace(lambda t: t.update(marker_color=colors.get(t.name, 'grey')))
+
+    return fig
+
+
+
+
+
+def generate_stacked_bar_chart_eat(filtered_df):
+    # Filter for the 'EAT' category only
+    filtered_df = filtered_df [filtered_df ['Catégorie'] == 'EAT'].copy()
+    
+    # Convert percentage strings to float and handle missing values
+    for col in ['Rentabilite', 'Taux Opex', 'Taux Coût des produits vendus']:
+        filtered_df[col] = pd.to_numeric(
+            filtered_df[col].str.rstrip('%').replace('', '0'),
+            errors='coerce'
+        ) / 100
+    
+    # Reordering the months if needed
+    months_order = [
+        'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+        'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+    ]
+    filtered_df['Mois'] = pd.Categorical(
+        filtered_df['Mois'],
+        categories=months_order,
+        ordered=True
+    )
+    filtered_df.sort_values('Mois', inplace=True)
+    
+    # Create the figure
+    fig = go.Figure()
+    
+    # Add traces for each category
+    for measure, color in zip(
+        ['Taux Coût des produits vendus', 'Taux Opex', 'Rentabilite'],
+        ['#1f77b4', '#ff7f0e', '#2ca02c']
+    ):
+        fig.add_trace(go.Bar(
+            name=measure,
+            x=filtered_df['Mois'],
+            y=filtered_df[measure],
+            marker_color=color,
+            text=filtered_df[measure].apply(lambda x: f'{x:.0%}')
+        ))
+    
+    # Update layout for stack to be 100%
+    fig.update_layout(
+        barmode='relative',
+        title='Coût des ventes, Opex ratio et Rentabilité pour la catégorie EAT',
+        xaxis=dict(title='Mois'),
+        yaxis=dict(title='Pourcentage', tickformat=',.0%', range=[-1, 1]),
+        legend_title_text='Mesures',
+        legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
+    )
+    
+    # Add text inside bars
+    fig.update_traces(texttemplate='%{text}', textposition='inside')
+
+    return fig
+
 #############################################################################################################################################
 
 
@@ -2212,54 +3102,52 @@ app.layout = html.Div([
     html.Link(
         rel='stylesheet',
         href='https://adminlte.io/themes/v3/dist/css/adminlte.min.css?v=3.2.0'),
+        html.Div([
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H1("DASHBOARD TABOO", className="m-0",
+                            style={'font-weight': 'bold', 'font-size': '36px'})  # Ajoutez ici le style CSS pour le gras et la taille de police)
+                ], className="col-sm-8"),
+                html.Div([
+                    html.Ol([
+                        html.Li(id='current-time', className="breadcrumb-item active")
+                    ], className="breadcrumb float-sm-right")
+                ], className="col-sm-4")
+            ], className="row mb-2"),
+            html.Div([
+                html.Div([
+                    dcc.Dropdown(id='year-dropdown', options=[{'label': str(annee), 'value': annee} for annee in annee_list],
+                                value=None, placeholder="Sélectionnez les Années", multi=True)
+                ], className='col-md-3'),
+
+                html.Div([
+                    dcc.Dropdown(id='month-dropdown', options=[{'label': mois, 'value': mois} for mois in mois_list],
+                                value=None, placeholder="Sélectionnez les mois", multi=True)
+                ], className='col-md-3'),
+                    
+                html.Div([
+                    dcc.Dropdown(id='categorie-dropdown', options=[{'label': str(categorie), 'value': categorie} for categorie in categorie_list],
+                                value=None, placeholder="Sélectionnez les catégories", multi=True)
+                ], className='col-md-3'),
+
+                html.Div([
+                    dcc.Dropdown(id='sous-categorie-dropdown', options=[{'label': str(sous_categorie), 'value': sous_categorie} for sous_categorie in sous_categorie_list],
+                                value=None, placeholder="Sélectionnez les sous catégorie", multi=True)
+                ], className='col-md-3'),
+
+            ], className='row mb-3'),
+
+            html.Div(id='revenue-summary')
+
+        ], className="container-fluid")
+    ], className="content-header mb-4 pb-1", style={'background-color': '#c2c2c3'} ),
     html.Div(id='page-content')
 ])
 
 # Définition des différentes pages de l'application
 page_1_layout = html.Div([
-    dcc.Link('DASHBOARD ANALYSE TB', href='/page-2') ,# Lien vers la page 2
-
-    html.Div([
-        html.Div([
-            html.Div([
-                html.Div([
-                    html.H1("DASHBOARD  INVENTAIRES", className="m-0",
-                            style={'font-weight': 'bold', 'font-size': '36px'})  # Ajoutez ici le style CSS pour le gras et la taille de police)
-                ], className="col-sm-8"),
-                html.Div([
-                    html.Ol([
-                        html.Li(id='current-time', className="breadcrumb-item active")
-                    ], className="breadcrumb float-sm-right")
-                ], className="col-sm-4")
-            ], className="row mb-2"),
-            html.Div([
-                html.Div([
-                    dcc.Dropdown(id='year-dropdown', options=[{'label': str(annee), 'value': annee} for annee in annee_list],
-                                value=None, placeholder="Sélectionnez les années", multi=True)
-                ], className='col-md-3'),
-
-                html.Div([
-                    dcc.Dropdown(id='month-dropdown', options=[{'label': mois, 'value': mois} for mois in mois_list],
-                                value=None, placeholder="Sélectionnez les mois", multi=True)
-                ], className='col-md-3'),
-                    
-                html.Div([
-                    dcc.Dropdown(id='categorie-dropdown', options=[{'label': str(categorie), 'value': categorie} for categorie in categorie_list],
-                                value=None, placeholder="Sélectionnez les catégories", multi=True)
-                ], className='col-md-3'),
-
-                html.Div([
-                    dcc.Dropdown(id='sous-categorie-dropdown', options=[{'label': str(sous_categorie), 'value': sous_categorie} for sous_categorie in sous_categorie_list],
-                                value=None, placeholder="Sélectionnez les sous catégorie", multi=True)
-                ], className='col-md-3'),
-
-            ], className='row mb-3'),
-
-            html.Div(id='revenue-summary')
-
-        ], className="container-fluid")
-    ], className="content-header mb-4 pb-1", style={'background-color': '#c2c2c3'} ),
-
+    dcc.Link('VOIR LE DASHBOARD ANALYSE TB', href='/page-2') ,# Lien vers la page 2
     html.Section([
         html.Div([
             html.Div([
@@ -2267,56 +3155,12 @@ page_1_layout = html.Div([
             ], className="container-fluid")
         ], className="row"),
     ], className="content"),
-        dcc.Link('DASHBOARD ANALYSE TB', href='/page-2') # Lien vers la page 2
-
+        dcc.Link('VOIR LE  DASHBOARD ANALYSE TB', href='/page-2') # Lien vers la page 2
 
 ])
 
 page_2_layout = html.Div([
-    dcc.Link('DASHBOARD  INVENTAIRES', href='/'), # Lien vers la page 1
-
-
-    html.Div([
-        html.Div([
-            html.Div([
-                html.Div([
-                    html.H1("DASHBOARD ANALYSE TB", className="m-0",
-                            style={'font-weight': 'bold', 'font-size': '36px'})  # Ajoutez ici le style CSS pour le gras et la taille de police)
-                ], className="col-sm-8"),
-                html.Div([
-                    html.Ol([
-                        html.Li(id='current-time', className="breadcrumb-item active")
-                    ], className="breadcrumb float-sm-right")
-                ], className="col-sm-4")
-            ], className="row mb-2"),
-            html.Div([
-                html.Div([
-                    dcc.Dropdown(id='year-dropdown', options=[{'label': str(annee), 'value': annee} for annee in annee_list],
-                                value=None, placeholder="Sélectionnez les années", multi=True)
-                ], className='col-md-3'),
-
-                html.Div([
-                    dcc.Dropdown(id='month-dropdown', options=[{'label': mois, 'value': mois} for mois in mois_list],
-                                value=None, placeholder="Sélectionnez les mois", multi=True)
-                ], className='col-md-3'),
-                    
-                html.Div([
-                    dcc.Dropdown(id='categorie-dropdown', options=[{'label': str(categorie), 'value': categorie} for categorie in categorie_list],
-                                value=None, placeholder="Sélectionnez les catégories", multi=True)
-                ], className='col-md-3'),
-
-                html.Div([
-                    dcc.Dropdown(id='sous-categorie-dropdown', options=[{'label': str(sous_categorie), 'value': sous_categorie} for sous_categorie in sous_categorie_list],
-                                value=None, placeholder="Sélectionnez les sous catégorie", multi=True)
-                ], className='col-md-3'),
-
-            ], className='row mb-3'),
-
-            html.Div(id='revenue-summary')
-
-        ], className="container-fluid")
-    ], className="content-header mb-4 pb-1", style={'background-color': '#c2c2c3'} ),
-
+    dcc.Link('VOIR LE DASHBOARD  INVENTAIRES', href='/'), # Lien vers la page 1
     html.Section([
         html.Div([
             html.Div([
@@ -2324,14 +3168,14 @@ page_2_layout = html.Div([
             ], className="container-fluid")
         ], className="row"),
     ], className="content"),
-    dcc.Link('DASHBOARD  INVENTAIRES', href='/') # Lien vers la page 1
+    dcc.Link('VOIR LE DASHBOARD  INVENTAIRES', href='/') # Lien vers la page 1
 ])
 
 # Callback pour afficher la page correspondante en fonction de l'URL
 @app.callback(Output('page-content', 'children'),
               [Input('url', 'pathname')])
 def display_page(pathname):
-    if pathname == '/':
+    if pathname == '/': 
         return page_1_layout
     elif pathname == '/page-2':
         return page_2_layout
@@ -2385,11 +3229,11 @@ def update_revenue_summary(selected_months, selected_years, selected_categories,
         selected_categorie_names = ', '.join(selected_categories)
         if selected_sous_categories:
             selected_sous_categorie_names = ', '.join(selected_sous_categories)
-            formatted_message = f"Le chiffre d'affaires de(s) sous-catégorie(s) {selected_sous_categorie_names} de(s) catégorie(s) {selected_categorie_names} du mois de {selected_month_names} de l'année {selected_year_names}"
+            formatted_message = f"Le chiffre d'affaires de(s) sous-catégorie(s) {selected_sous_categorie_names} de(s) catégorie(s) {selected_categorie_names} du mois de {selected_month_names} de l'Années {selected_year_names}"
         else:
-            formatted_message = f"Le chiffre d'affaires de(s) catégorie(s) {selected_categorie_names} du mois de {selected_month_names} de l'année {selected_year_names}"
+            formatted_message = f"Le chiffre d'affaires de(s) catégorie(s) {selected_categorie_names} du mois de {selected_month_names} de l'Années {selected_year_names}"
     else:
-        formatted_message = f"Le chiffre d'affaires du mois de {selected_month_names} de l'année {selected_year_names}"
+        formatted_message = f"Le chiffre d'affaires du mois de {selected_month_names} de l'Années {selected_year_names}"
 
     return html.Div([
         html.Div([
@@ -2414,9 +3258,52 @@ def update_current_time(n_intervals):
     Input('month-dropdown', 'value'),
     Input('year-dropdown', 'value'),
     Input('categorie-dropdown', 'value'),
-    Input('sous-categorie-dropdown', 'value')
+    Input('sous-categorie-dropdown', 'value'),
+    [Input('url', 'pathname')]
 )
-def update_visualizations(selected_months, selected_years, selected_categories, selected_sous_categories):
+def update_visualizations(selected_months, selected_years, selected_categories, selected_sous_categories,pathname):
+    # Chemin complet vers le fichier source
+    file_path = Path("inputcons/Variations_Combined_Details.xlsx")#r"Variations_Combined_Details.xlsx"
+
+    # Lire les données du fichier Excel dans un DataFrame pandas
+    df2 = pd.read_excel(file_path)
+    #print(df2)
+    #####################################################SECONDE PARTIE#############################################################
+
+    # Chargement des données à partir du fichier Excel
+    #file_path =  r"C:\Users\Administrateur\Desktop\Dashboardv001\inputcons\BD.xlsx"
+    #chemin_court = "inputcons/BD.xlsx"
+    filepath = Path("inputcons/BD.xlsx")
+    df1 = pd.read_excel(filepath) #inventaire2_df.copy()    #-pd.read_excel(output_path)
+    #print(df)
+
+    global df
+    global mois_list
+    global annee_list
+    global categorie_list
+    global sous_categorie_list
+
+    if pathname == '/': 
+        df = df1
+    elif pathname == '/page-2':
+        df = df2
+        sous_categorie_list = []
+
+    # Obtenir la liste des mois uniques dans la colonne 'Mois'
+    #mois_list = df['Mois'].unique()
+    df['Mois'] = df['Mois'].astype(str)
+
+    mois_list = sorted(df['Mois'].unique())
+
+    # Obtenir la liste des Années uniques dans la colonne 'Années'
+    annee_list = df['Années'].unique()
+
+    # Obtenir la liste des Années uniques dans la colonne 'Années'
+    categorie_list = df['Catégorie'].unique()
+
+    #df = pd.read_excel(output_path)
+    #print(df.head())
+
     if selected_months is None or selected_years is None:
         return html.Div()
 
@@ -2426,8 +3313,11 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
     if selected_categories:
         filtered_df = filtered_df[filtered_df['Catégorie'].isin(selected_categories)]
     
-    if selected_sous_categories:
-        filtered_df = filtered_df[filtered_df['Sous-catégorie'].isin(selected_sous_categories)]
+    if pathname == '/': 
+        # Obtenir la liste des Années uniques dans la colonne 'Années'
+        sous_categorie_list = df['Sous-catégorie'].unique()
+        if selected_sous_categories:
+            filtered_df = filtered_df[filtered_df['Sous-catégorie'].isin(selected_sous_categories)]
 
     if filtered_df.empty:
         return html.Div([
@@ -2440,36 +3330,37 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
             ], className="small-box bg-danger")
         ], className="col-lg-12 col-12")
     
-    # Utilisation des différentes fonctions de génération de graphiques
-    fig_pie_chart_weight_on_revenue = generate_pie_chart_weight_on_revenue(filtered_df)#1
-    fig0 = generate_bar_chart_revenue_by_month(dif)#2
-    fig_treemap_item_subcategory = generate_treemap_item_subcategory(filtered_df)#3
-    fig_sunburst_item_category = generate_sunburst_item_category(filtered_df)#5
-    fig_sunburst_subcategory_within_category = generate_sunburst_subcategory_within_category(filtered_df)#6
-    fig_bar_weight_on_revenue = generate_bar_weight_on_revenue(filtered_df)#10
-    fig_box_category_revenue = generate_box(filtered_df)#8
-    fig_box_total_revenue = generate(filtered_df)#9
-    ###########fig_box_total_revenu = generate_(filtered_df)#7
-    fig_total_revenu =  total_revenue(filtered_df)#11
-    fig_total = generate_treemap_subcategory(filtered_df)#4
-    fig = create_stacked_bar_chart(filtered_df)#12
-    eat = generate_eat_graph(graph)
-    smoke = generate_smoke_graph(graph)
-    drink = generate_drink_graph(graph)
-    eat1 = generat_eat_graph(graph)
-    drink1 = generat_drink_graph(graph)
-    smoke1 = generat_smoke_graph(graph)
-    eat2 = genera_eat_graph(graph)
-    drink2 = genera_drink_graph(graph)
-    smoke2 = genera_smoke_graph(graph)
-    opex = generate_combined_bar_chart(file_path, categories)
-    Rentabilite = generate_combined_bar_chart1(file_path, categories) 
-    tcpv = generate_combined_bar_chart2(file_path, categories) 
-    tmb = generate_combined_bar_chart3(file_path, categories) 
-    figl = create_sales_dashboard(dfl)
-
-
-    return html.Div([
+    if pathname == '/':
+        # Utilisation des différentes fonctions de génération de graphiques
+        fig_pie_chart_weight_on_revenue = generate_pie_chart_weight_on_revenue(filtered_df)#1
+        fig0 = generate_bar_chart_revenue_by_month(dif)#2
+        fig_treemap_item_subcategory = generate_treemap_item_subcategory(filtered_df)#3
+        fig_total = generate_treemap_subcategory(filtered_df)#4
+        fig_sunburst_item_category = generate_sunburst_item_category(filtered_df)#5
+        fig_sunburst_subcategory_within_category = generate_sunburst_subcategory_within_category(filtered_df)#6
+        fig_bar_weight_on_revenue = generate_bar_weight_on_revenue(filtered_df)#10
+        fig_box_category_revenue = generate_box(filtered_df)#8
+        fig_box_total_revenue = generate(filtered_df)#9
+        ###########fig_box_total_revenu = generate_(filtered_df)#7
+        fig_total_revenu =  total_revenue(filtered_df)#11
+      
+        fig = create_stacked_bar_chart(filtered_df)#12
+        #eat = generate_eat_graph(graph)
+        #smoke = generate_smoke_graph(graph)
+        #drink = generate_drink_graph(graph)
+        #eat1 = generat_eat_graph(graph)
+        #drink1 = generat_drink_graph(graph)
+        #smoke1 = generat_smoke_graph(graph)
+        #eat2 = genera_eat_graph(graph)
+        #drink2 = genera_drink_graph(graph)
+        #smoke2 = genera_smoke_graph(filtered_df)
+        opex = generate_combined_bar_chart(file_path, categories)
+        Rentabilite = generate_combined_bar_chart1(file_path, categories) 
+        tcpv = generate_combined_bar_chart2(file_path, categories) 
+        tmb = generate_combined_bar_chart3(file_path, categories) 
+        figl = create_sales_dashboard(dfl,annee_list) 
+        
+        return html.Div([
                 html.Div([
                     html.Div([
                         html.Div([
@@ -2518,7 +3409,7 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
                     ], className="card-body")
                 ], className="card card-primary card-outline")
             ], className="col-md-6"),
-
+"""
             html.Div([
                 html.Div([
                     html.Div([
@@ -2531,7 +3422,7 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
                         ], className="card-body pad table-responsive p-0")
                     ], className="card-body")
                 ], className="card card-primary card-outline")
-            ], className="col-md-6"),
+            ], className="col-md-6")""",
 
             html.Div([
                 html.Div([
@@ -2546,7 +3437,7 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
                     ], className="card-body")
                 ], className="card card-primary card-outline")
             ], className="col-md-6"),
-
+"""
             html.Div([
                 html.Div([
                     html.Div([
@@ -2648,7 +3539,104 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
         ], className="col-md-6"),
 
 
+        
+
+         html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Taux des ventes par catégorie".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=tcpv.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-4"),
+
         html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Rentabilité par ncatégorie".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=Rentabilite.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-4"),
+
+
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Taux de la marge brute par catégorie".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=tmb.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-4"),
+""",
+
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Analyse des Performances de Vente par Heure, Mois et Années".upper(),
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=figl.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-12"),
+
+
+
+
+       
+
+
+        ], className="row")
+
+    elif pathname == '/page-2':
+        #print(df)
+        df
+        eat = generate_eat_graph(filtered_df)
+        smoke = generate_smoke_graph(filtered_df)
+        drink = generate_drink_graph(filtered_df)
+        eat1 = generat_eat_graph(filtered_df)
+        drink1 = generat_drink_graph(filtered_df)
+        smoke1 = generat_smoke_graph(filtered_df)
+        eat2 = genera_eat_graph(filtered_df)
+        drink2 = genera_drink_graph(filtered_df)
+        #smoke2 = genera_smoke_graph(filtered_df)
+        smoke2 = genera_smoke_graph(filtered_df)
+        #opex = generate_combined_bar_chart(file_path, categories)
+        CAMB = generate_chart_for_category_eat(filtered_df)
+        CAMB1 = generate_chart_for_category_drink(filtered_df)
+        CAMB2 = generate_chart_for_category_smoke(filtered_df)
+        CAR = generate_rentabilite_eat(filtered_df)
+        CAR1 = generate_rentabilite_drink(filtered_df)
+        CAR2 = generate_rentabilite_smoke(filtered_df)
+        opexev = generate_opex_evolution_chart(filtered_df)
+        tmb = generate_mb_evolution_chart(filtered_df)
+        #rent = generate_rent_evolution_chart(filtered_df)
+        rent1 = generate_rentability_evolution_chart(filtered_df)
+        vor = generate_stacked_bar_chart_eat(filtered_df)
+
+        
+        return html.Div([
+            
+             html.Div([
             html.Div([
                 html.Div([
                     html.H3("Eat- Taux Coûts des Ventes et la Rentabilité".upper(),
@@ -2771,7 +3759,6 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
         ], className="col-md-4"),
 
 
-
         html.Div([
             html.Div([
                 html.Div([
@@ -2787,71 +3774,160 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
         ], className="col-md-4"),
 
 
+        html.Div([
+                html.Div([
+                    html.Div([
+                        html.H3("EAT : Évolution de la Marge brute et du Chiffre d\'affaires".upper(), #Répartition des charges par catégorie
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                    ], className="card-header"),
+                    html.Div([
+                        html.Div([
+                            html.Div(dcc.Graph(figure = CAMB.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),#figure=fig_box_total_revenu
+                        ], className="card-body pad table-responsive p-0")
+                    ], className="card-body")
+                ], className="card card-primary card-outline")
+            ], className="col-md-4"),
+
+
          html.Div([
-            html.Div([
-                html.Div([
-                    html.H3("Taux des ventes par catégorie".upper(),
-                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
-                ], className="card-header"),
                 html.Div([
                     html.Div([
-                        html.Div(dcc.Graph(figure=tcpv.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
-                    ], className="card-body pad table-responsive p-0")
-                ], className="card-body")
-            ], className="card card-primary card-outline")
-        ], className="col-md-4"),
-
-        html.Div([
-            html.Div([
-                html.Div([
-                    html.H3("Rentabilité par ncatégorie".upper(),
-                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
-                ], className="card-header"),
-                html.Div([
+                        html.H3("DRINK : Évolution de la Marge brute et du Chiffre d\'affaires".upper(), #Répartition des charges par catégorie
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                    ], className="card-header"),
                     html.Div([
-                        html.Div(dcc.Graph(figure=Rentabilite.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
-                    ], className="card-body pad table-responsive p-0")
-                ], className="card-body")
-            ], className="card card-primary card-outline")
-        ], className="col-md-4"),
+                        html.Div([
+                            html.Div(dcc.Graph(figure = CAMB1.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),#figure=fig_box_total_revenu
+                        ], className="card-body pad table-responsive p-0")
+                    ], className="card-body")
+                ], className="card card-primary card-outline")
+            ], className="col-md-4"),
 
 
         html.Div([
-            html.Div([
-                html.Div([
-                    html.H3("Taux de la marge brute par catégorie".upper(),
-                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
-                ], className="card-header"),
                 html.Div([
                     html.Div([
-                        html.Div(dcc.Graph(figure=tmb.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
-                    ], className="card-body pad table-responsive p-0")
-                ], className="card-body")
-            ], className="card card-primary card-outline")
-        ], className="col-md-4"),
+                        html.H3("SMOKE : Évolution de la Marge brute et du Chiffre d\'affaires ".upper(), #Répartition des charges par catégorie
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                    ], className="card-header"),
+                    html.Div([
+                        html.Div([
+                            html.Div(dcc.Graph(figure = CAMB2.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),#figure=fig_box_total_revenu
+                        ], className="card-body pad table-responsive p-0")
+                    ], className="card-body")
+                ], className="card card-primary card-outline")
+            ], className="col-md-4"), 
 
 
         html.Div([
-            html.Div([
-                html.Div([
-                    html.H3("Analyse des Performances de Vente par Heure, Mois et Année".upper(),
-                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
-                ], className="card-header"),
                 html.Div([
                     html.Div([
-                        html.Div(dcc.Graph(figure=figl.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
-                    ], className="card-body pad table-responsive p-0")
-                ], className="card-body")
-            ], className="card card-primary card-outline")
-        ], className="col-md-12"),
+                        html.H3("EAT : Évolution de la Rentabilité et du Chiffre d\'affaires ".upper(), #Répartition des charges par catégorie
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                    ], className="card-header"),
+                    html.Div([
+                        html.Div([
+                            html.Div(dcc.Graph(figure = CAR.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),#figure=fig_box_total_revenu
+                        ], className="card-body pad table-responsive p-0")
+                    ], className="card-body")
+                ], className="card card-primary card-outline")
+            ], className="col-md-4"), 
+
+        html.Div([
+                html.Div([
+                    html.Div([
+                        html.H3("DRINK : Évolution de la Rentabilité et du Chiffre d\'affaires ".upper(), #Répartition des charges par catégorie
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                    ], className="card-header"),
+                    html.Div([
+                        html.Div([
+                            html.Div(dcc.Graph(figure = CAR1.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),#figure=fig_box_total_revenu
+                        ], className="card-body pad table-responsive p-0")
+                    ], className="card-body")
+                ], className="card card-primary card-outline")
+            ], className="col-md-4"),
+
+
+        html.Div([
+                html.Div([
+                    html.Div([
+                        html.H3("SMOKE : Évolution de la Rentabilité et du Chiffre d\'affaires ".upper(), #Répartition des charges par catégorie
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                    ], className="card-header"),
+                    html.Div([
+                        html.Div([
+                            html.Div(dcc.Graph(figure = CAR2.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),#figure=fig_box_total_revenu
+                        ], className="card-body pad table-responsive p-0")
+                    ], className="card-body")
+                ], className="card card-primary card-outline")
+            ], className="col-md-4"), 
+
+
+          html.Div([
+                html.Div([
+                    html.Div([
+                        html.H3("Évolution du taux des Opex".upper(), #Répartition des charges par catégorie
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                    ], className="card-header"),
+                    html.Div([
+                        html.Div([
+                            html.Div(dcc.Graph(figure = opexev.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),#figure=fig_box_total_revenu
+                        ], className="card-body pad table-responsive p-0")
+                    ], className="card-body")
+                ], className="card card-primary card-outline")
+            ], className="col-md-4"),
+
+
+
+           html.Div([
+                html.Div([
+                    html.Div([
+                        html.H3("Évolution du taux de la marge brute".upper(), #Répartition des charges par catégorie
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                    ], className="card-header"),
+                    html.Div([
+                        html.Div([
+                            html.Div(dcc.Graph(figure = tmb.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),#figure=fig_box_total_revenu
+                        ], className="card-body pad table-responsive p-0")
+                    ], className="card-body")
+                ], className="card card-primary card-outline")
+            ], className="col-md-4"),            
+             
+
+           html.Div([
+                html.Div([
+                    html.Div([
+                        html.H3("Évolution de la rentabilité".upper(), #Répartition des charges par catégorie
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                    ], className="card-header"),
+                    html.Div([
+                        html.Div([
+                            html.Div(dcc.Graph(figure = rent1.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),#figure=fig_box_total_revenu
+                        ], className="card-body pad table-responsive p-0")
+                    ], className="card-body")
+                ], className="card card-primary card-outline")
+            ], className="col-md-4"),  
 
 
 
 
-       
 
+         html.Div([
+                html.Div([
+                    html.Div([
+                        html.H3("Coût des ventes vs OPEX vs Rentabilité".upper(), #Répartition des charges par catégorie
+                                className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                    ], className="card-header"),
+                    html.Div([
+                        html.Div([
+                            html.Div(dcc.Graph(figure = vor.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),#figure=fig_box_total_revenu
+                        ], className="card-body pad table-responsive p-0")
+                    ], className="card-body")
+                ], className="card card-primary card-outline")
+            ], className="col-md-4"),     
 
         ], className="row")
+
 
 
 #if __name__ == '__main__':

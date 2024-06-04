@@ -336,34 +336,27 @@ tcd.to_excel(new_filtered_excel_file, index=True)
 print(f"Données consolidées et enregistrées dans '{new_filtered_excel_file}'.")
 
 
-input_directory = r'input'
-
-# Créer une liste pour stocker les DataFrames
+# Liste pour stocker les DataFrames de chaque fichier
 data_frames = []
 
-# Lire le premier fichier Excel dans le répertoire
-filename = os.listdir(input_directory)[0]
-if filename.endswith('.xlsx') and not filename.startswith('~$'):
-    file_path = os.path.join(input_directory, filename)
-    try:
-        # Lire le fichier Excel dans un DataFrame
-        df = pd.read_excel(file_path)
-        # Ajouter le DataFrame à la liste
-        data_frames.append(df)
-    except PermissionError:
-        print(f"Ignoré : {filename} (Fichier verrouillé)")
-else:
-    print("Aucun fichier valide trouvé dans le répertoire.")
 
+# Parcourir tous les fichiers Excel dans le répertoire
+for filename in os.listdir(input_directory):
+    if filename.endswith('.xlsx') and not filename.startswith('~$'):
+        file_path = os.path.join(input_directory, filename)
+        try:
+            # Lire le fichier Excel dans un DataFrame
+            df = pd.read_excel(file_path)
+            # Ajouter le DataFrame à la liste
+            data_frames.append(df)
+        except PermissionError:
+            print(f"Ignoré : {filename} (Fichier verrouillé)")
 
-
-            
 # Concaténer les DataFrames en un seul DataFrame
 consolidated_df = pd.concat(data_frames, ignore_index=True)
 
-# Vous pouvez continuer à utiliser consolidated_df comme vous le souhaitez
-print(consolidated_df.head())
 
+inventaire2_df = consolidated_df 
 
 # Définition du dictionnaire de correspondance des mois anglais et français
 month_translation = {
@@ -382,12 +375,6 @@ month_translation = {
 }
 
 
-# Lire le fichier CSV en spécifiant le délimiteur et le format de date
-#consolidated_df = pd.read_csv(path_to_file, delimiter=';', parse_dates=['Date'], dayfirst=True)
-
-# Charger le fichier consolidé
-#iconsolidated_df = df.copy()
-
 # Renommer les colonnes existantes
 consolidated_df.rename(columns={"Type": "Catégorie", "Categorie": "Sous-catégorie", "Produits": "Item", "TTC": "Total TTC"}, inplace=True)
 
@@ -396,12 +383,12 @@ consolidated_df["Date"] = pd.to_datetime(consolidated_df["Date"])
 consolidated_df["Mois"] = consolidated_df["Date"].dt.strftime("%B").map(month_translation)
 
 # Ajouter la colonne Année
-consolidated_df["Années"] = consolidated_df["Date"].dt.year
+consolidated_df["Année"] = consolidated_df["Date"].dt.year
 
 
 
 # Réorganiser les colonnes selon votre préférence
-column_order = ["Date", "Mois", "Années", "Catégorie", "Sous-catégorie", "Item", "Qté", "offert", "Offert formule", "Total Qté", "Total TTC", "Cout", "Total Remise", "Total remisé", "Total HT"]
+column_order = ["Date", "Mois", "Année", "Catégorie", "Sous-catégorie", "Item", "Qté", "offert", "Offert formule", "Total Qté", "Total TTC", "Cout", "Total Remise", "Total remisé", "Total HT"]
 consolidated_df = consolidated_df[column_order]
 
 inventaire2_df = consolidated_df
@@ -417,13 +404,10 @@ total_sum = inventaire2_df['Total Qté'].sum()
 
 inventaire2_df['Quantité Relative'] = inventaire2_df['Total Qté'] / sous_cat_sum
 
-# Supprimer les lignes où la colonne 'Date' est vide
-inventaire2_df.dropna(subset=['Date'], inplace=True)
+
 # Afficher le DataFrame consolidé
 
-#inventaire2_df
-
-
+inventaire2_df
 
 
 # Chemin du répertoire où vous voulez enregistrer le fichier Excel
@@ -446,17 +430,12 @@ inventaire2_df.to_excel(output_path, index=False)
 # Chargement des données à partir du fichier Excel
 #file_path =  r"C:\Users\Administrateur\Desktop\Dashboardv001\inputcons\BD.xlsx"
 
-#######df = pd.read_excel(output_path) #inventaire2_df.copy()    #pd.read_excel(file_path)
-#print(df)
+df = inventaire2_df    #pd.read_excel(file_path)
+
 
 # Obtenir la liste des mois uniques dans la colonne 'Mois'
 #mois_list = df['Mois'].unique()
-######df['Mois'] = df['Mois'].astype(str)
-
-######mois_list = sorted(df['Mois'].unique())
-
-
-
+mois_list = sorted(df['Mois'].unique())
 # Créez un dictionnaire de correspondance entre les noms de mois et les numéros de mois
 #mois_numeros = {
     #'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5, 'Juin': 6,
@@ -469,15 +448,15 @@ inventaire2_df.to_excel(output_path, index=False)
 
 
 # Obtenir la liste des années uniques dans la colonne 'Année'
-#######annee_list = df['Années'].unique()
-#annee_list = df['Années'].astype(int).unique()
+#annee_list = df['Années'].unique()
+annee_list = df['Années'].astype(int).unique()
 
 
 # Obtenir la liste des années uniques dans la colonne 'Année'
-######categorie_list = df['Catégorie'].unique()
+categorie_list = df['Catégorie'].unique()
 
 # Obtenir la liste des années uniques dans la colonne 'Année'
-#######sous_categorie_list = df['Sous-catégorie'].unique()
+sous_categorie_list = df['Sous-catégorie'].unique()
 
 
 #################################################################################################################################################
@@ -905,52 +884,6 @@ result.to_excel(output_file_path, index=False)
 
 print(f"Les calculs ont été effectués avec succès et enregistrés dans {excel_file_path}")
 
-# Chemin complet vers le fichier source
-file_path = Path("inputcons/Variations_Combined_Details.xlsx")#r"Variations_Combined_Details.xlsx"
-
-# Lire les données du fichier Excel dans un DataFrame pandas
-#df = pd.read_excel(file_path)
-#print(df)
-#####################################################SECONDE PARTIE#############################################################
-
-# Chargement des données à partir du fichier Excel
-#file_path =  r"C:\Users\Administrateur\Desktop\Dashboardv001\inputcons\BD.xlsx"
-#chemin_court = "inputcons/BD.xlsx"
-filepath = Path("inputcons/BD.xlsx")
-df = pd.read_excel(filepath) #inventaire2_df.copy()    #-pd.read_excel(output_path)
-#print(df)
-
-# Obtenir la liste des mois uniques dans la colonne 'Mois'
-#mois_list = df['Mois'].unique()
-df['Mois'] = df['Mois'].astype(str)
-
-mois_list = sorted(df['Mois'].unique())
-
-
-
-# Créez un dictionnaire de correspondance entre les noms de mois et les numéros de mois
-#mois_numeros = {
-    #'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4, 'Mai': 5, 'Juin': 6,
-    #'Juillet': 7, 'Août': 8, 'Septembre': 9, 'Octobre': 10, 'Novembre': 11, 'Décembre': 12
-#}
-
-# Triez les mois en fonction de leur numéro de mois
-#mois_list = sorted(df['Mois'].unique(), key=lambda x: mois_numeros.get(x.lower(), 0))
-
-
-
-# Obtenir la liste des années uniques dans la colonne 'Année'
-annee_list = df['Années'].unique()
-#annee_list = df['Années'].astype(int).unique()
-
-
-# Obtenir la liste des années uniques dans la colonne 'Année'
-categorie_list = df['Catégorie'].unique()
-
-#df = pd.read_excel(output_path)
-print(df.head())
-# Obtenir la liste des années uniques dans la colonne 'Année'
-sous_categorie_list = df['Sous-catégorie'].unique()
 
 
 #################################################################################################################################################
@@ -2189,7 +2122,7 @@ def genera_smoke_graph(graph):
 # Copie de BD dans dif
 dif = inventaire2_df.copy()
 
-#df = ddff.copy() 
+
 
 
 ################################################ end #################################################################
@@ -2200,9 +2133,8 @@ app = dash.Dash(__name__)
 
 # Ajustement de la taille des graphiques Sunburst
 sunburst_height = 200
-# Définition de la mise en page principale
+
 app.layout = html.Div([
-    dcc.Location(id='url', refresh=False),
     html.Link(
         rel='stylesheet',
         href='https://adminlte.io/themes/v3/plugins/fontawesome-free/css/all.min.css'),    
@@ -2212,18 +2144,12 @@ app.layout = html.Div([
     html.Link(
         rel='stylesheet',
         href='https://adminlte.io/themes/v3/dist/css/adminlte.min.css?v=3.2.0'),
-    html.Div(id='page-content')
-])
-
-# Définition des différentes pages de l'application
-page_1_layout = html.Div([
-    dcc.Link('DASHBOARD ANALYSE TB', href='/page-2') ,# Lien vers la page 2
 
     html.Div([
         html.Div([
             html.Div([
                 html.Div([
-                    html.H1("DASHBOARD  INVENTAIRES", className="m-0",
+                    html.H1("DASHBOARD D'ANALYSE DES DONNEES", className="m-0",
                             style={'font-weight': 'bold', 'font-size': '36px'})  # Ajoutez ici le style CSS pour le gras et la taille de police)
                 ], className="col-sm-8"),
                 html.Div([
@@ -2267,77 +2193,9 @@ page_1_layout = html.Div([
             ], className="container-fluid")
         ], className="row"),
     ], className="content"),
-        dcc.Link('DASHBOARD ANALYSE TB', href='/page-2') # Lien vers la page 2
 
-
-])
-
-page_2_layout = html.Div([
-    dcc.Link('DASHBOARD  INVENTAIRES', href='/'), # Lien vers la page 1
-
-
-    html.Div([
-        html.Div([
-            html.Div([
-                html.Div([
-                    html.H1("DASHBOARD ANALYSE TB", className="m-0",
-                            style={'font-weight': 'bold', 'font-size': '36px'})  # Ajoutez ici le style CSS pour le gras et la taille de police)
-                ], className="col-sm-8"),
-                html.Div([
-                    html.Ol([
-                        html.Li(id='current-time', className="breadcrumb-item active")
-                    ], className="breadcrumb float-sm-right")
-                ], className="col-sm-4")
-            ], className="row mb-2"),
-            html.Div([
-                html.Div([
-                    dcc.Dropdown(id='year-dropdown', options=[{'label': str(annee), 'value': annee} for annee in annee_list],
-                                value=None, placeholder="Sélectionnez les années", multi=True)
-                ], className='col-md-3'),
-
-                html.Div([
-                    dcc.Dropdown(id='month-dropdown', options=[{'label': mois, 'value': mois} for mois in mois_list],
-                                value=None, placeholder="Sélectionnez les mois", multi=True)
-                ], className='col-md-3'),
-                    
-                html.Div([
-                    dcc.Dropdown(id='categorie-dropdown', options=[{'label': str(categorie), 'value': categorie} for categorie in categorie_list],
-                                value=None, placeholder="Sélectionnez les catégories", multi=True)
-                ], className='col-md-3'),
-
-                html.Div([
-                    dcc.Dropdown(id='sous-categorie-dropdown', options=[{'label': str(sous_categorie), 'value': sous_categorie} for sous_categorie in sous_categorie_list],
-                                value=None, placeholder="Sélectionnez les sous catégorie", multi=True)
-                ], className='col-md-3'),
-
-            ], className='row mb-3'),
-
-            html.Div(id='revenue-summary')
-
-        ], className="container-fluid")
-    ], className="content-header mb-4 pb-1", style={'background-color': '#c2c2c3'} ),
-
-    html.Section([
-        html.Div([
-            html.Div([
-                html.Div(id='visualizations-container'),
-            ], className="container-fluid")
-        ], className="row"),
-    ], className="content"),
-    dcc.Link('DASHBOARD  INVENTAIRES', href='/') # Lien vers la page 1
-])
-
-# Callback pour afficher la page correspondante en fonction de l'URL
-@app.callback(Output('page-content', 'children'),
-              [Input('url', 'pathname')])
-def display_page(pathname):
-    if pathname == '/':
-        return page_1_layout
-    elif pathname == '/page-2':
-        return page_2_layout
-    else:
-        return 'Page introuvable'
-    
+    dcc.Interval(id='interval-component', interval=1000, n_intervals=0),  # Rafraîchissement toutes les secondes
+], className='content-wrapper', style={'margin-left': '0px', 'min-height': '100vh'})
 
 @app.callback(
     Output('sous-categorie-dropdown', 'options'),

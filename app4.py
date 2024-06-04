@@ -2212,54 +2212,52 @@ app.layout = html.Div([
     html.Link(
         rel='stylesheet',
         href='https://adminlte.io/themes/v3/dist/css/adminlte.min.css?v=3.2.0'),
+        html.Div([
+        html.Div([
+            html.Div([
+                html.Div([
+                    html.H1("DASHBOARD", className="m-0",
+                            style={'font-weight': 'bold', 'font-size': '36px'})  # Ajoutez ici le style CSS pour le gras et la taille de police)
+                ], className="col-sm-8"),
+                html.Div([
+                    html.Ol([
+                        html.Li(id='current-time', className="breadcrumb-item active")
+                    ], className="breadcrumb float-sm-right")
+                ], className="col-sm-4")
+            ], className="row mb-2"),
+            html.Div([
+                html.Div([
+                    dcc.Dropdown(id='year-dropdown', options=[{'label': str(annee), 'value': annee} for annee in annee_list],
+                                value=None, placeholder="Sélectionnez les années", multi=True)
+                ], className='col-md-3'),
+
+                html.Div([
+                    dcc.Dropdown(id='month-dropdown', options=[{'label': mois, 'value': mois} for mois in mois_list],
+                                value=None, placeholder="Sélectionnez les mois", multi=True)
+                ], className='col-md-3'),
+                    
+                html.Div([
+                    dcc.Dropdown(id='categorie-dropdown', options=[{'label': str(categorie), 'value': categorie} for categorie in categorie_list],
+                                value=None, placeholder="Sélectionnez les catégories", multi=True)
+                ], className='col-md-3'),
+
+                html.Div([
+                    dcc.Dropdown(id='sous-categorie-dropdown', options=[{'label': str(sous_categorie), 'value': sous_categorie} for sous_categorie in sous_categorie_list],
+                                value=None, placeholder="Sélectionnez les sous catégorie", multi=True)
+                ], className='col-md-3'),
+
+            ], className='row mb-3'),
+
+            html.Div(id='revenue-summary')
+
+        ], className="container-fluid")
+    ], className="content-header mb-4 pb-1", style={'background-color': '#c2c2c3'} ),
     html.Div(id='page-content')
 ])
 
 # Définition des différentes pages de l'application
 page_1_layout = html.Div([
-    dcc.Link('DASHBOARD ANALYSE TB', href='/page-2') ,# Lien vers la page 2
-
-    html.Div([
-        html.Div([
-            html.Div([
-                html.Div([
-                    html.H1("DASHBOARD  INVENTAIRES", className="m-0",
-                            style={'font-weight': 'bold', 'font-size': '36px'})  # Ajoutez ici le style CSS pour le gras et la taille de police)
-                ], className="col-sm-8"),
-                html.Div([
-                    html.Ol([
-                        html.Li(id='current-time', className="breadcrumb-item active")
-                    ], className="breadcrumb float-sm-right")
-                ], className="col-sm-4")
-            ], className="row mb-2"),
-            html.Div([
-                html.Div([
-                    dcc.Dropdown(id='year-dropdown', options=[{'label': str(annee), 'value': annee} for annee in annee_list],
-                                value=None, placeholder="Sélectionnez les années", multi=True)
-                ], className='col-md-3'),
-
-                html.Div([
-                    dcc.Dropdown(id='month-dropdown', options=[{'label': mois, 'value': mois} for mois in mois_list],
-                                value=None, placeholder="Sélectionnez les mois", multi=True)
-                ], className='col-md-3'),
-                    
-                html.Div([
-                    dcc.Dropdown(id='categorie-dropdown', options=[{'label': str(categorie), 'value': categorie} for categorie in categorie_list],
-                                value=None, placeholder="Sélectionnez les catégories", multi=True)
-                ], className='col-md-3'),
-
-                html.Div([
-                    dcc.Dropdown(id='sous-categorie-dropdown', options=[{'label': str(sous_categorie), 'value': sous_categorie} for sous_categorie in sous_categorie_list],
-                                value=None, placeholder="Sélectionnez les sous catégorie", multi=True)
-                ], className='col-md-3'),
-
-            ], className='row mb-3'),
-
-            html.Div(id='revenue-summary')
-
-        ], className="container-fluid")
-    ], className="content-header mb-4 pb-1", style={'background-color': '#c2c2c3'} ),
-
+    dcc.Link('VOIR LE DASHBOARD ANALYSE TB', href='/page-2') ,# Lien vers la page 2
     html.Section([
         html.Div([
             html.Div([
@@ -2267,56 +2265,12 @@ page_1_layout = html.Div([
             ], className="container-fluid")
         ], className="row"),
     ], className="content"),
-        dcc.Link('DASHBOARD ANALYSE TB', href='/page-2') # Lien vers la page 2
-
+        dcc.Link('VOIR LE  DASHBOARD ANALYSE TB', href='/page-2') # Lien vers la page 2
 
 ])
 
 page_2_layout = html.Div([
-    dcc.Link('DASHBOARD  INVENTAIRES', href='/'), # Lien vers la page 1
-
-
-    html.Div([
-        html.Div([
-            html.Div([
-                html.Div([
-                    html.H1("DASHBOARD ANALYSE TB", className="m-0",
-                            style={'font-weight': 'bold', 'font-size': '36px'})  # Ajoutez ici le style CSS pour le gras et la taille de police)
-                ], className="col-sm-8"),
-                html.Div([
-                    html.Ol([
-                        html.Li(id='current-time', className="breadcrumb-item active")
-                    ], className="breadcrumb float-sm-right")
-                ], className="col-sm-4")
-            ], className="row mb-2"),
-            html.Div([
-                html.Div([
-                    dcc.Dropdown(id='year-dropdown', options=[{'label': str(annee), 'value': annee} for annee in annee_list],
-                                value=None, placeholder="Sélectionnez les années", multi=True)
-                ], className='col-md-3'),
-
-                html.Div([
-                    dcc.Dropdown(id='month-dropdown', options=[{'label': mois, 'value': mois} for mois in mois_list],
-                                value=None, placeholder="Sélectionnez les mois", multi=True)
-                ], className='col-md-3'),
-                    
-                html.Div([
-                    dcc.Dropdown(id='categorie-dropdown', options=[{'label': str(categorie), 'value': categorie} for categorie in categorie_list],
-                                value=None, placeholder="Sélectionnez les catégories", multi=True)
-                ], className='col-md-3'),
-
-                html.Div([
-                    dcc.Dropdown(id='sous-categorie-dropdown', options=[{'label': str(sous_categorie), 'value': sous_categorie} for sous_categorie in sous_categorie_list],
-                                value=None, placeholder="Sélectionnez les sous catégorie", multi=True)
-                ], className='col-md-3'),
-
-            ], className='row mb-3'),
-
-            html.Div(id='revenue-summary')
-
-        ], className="container-fluid")
-    ], className="content-header mb-4 pb-1", style={'background-color': '#c2c2c3'} ),
-
+    dcc.Link('VOIR LE DASHBOARD  INVENTAIRES', href='/'), # Lien vers la page 1
     html.Section([
         html.Div([
             html.Div([
@@ -2324,14 +2278,14 @@ page_2_layout = html.Div([
             ], className="container-fluid")
         ], className="row"),
     ], className="content"),
-    dcc.Link('DASHBOARD  INVENTAIRES', href='/') # Lien vers la page 1
+    dcc.Link('VOIR LE DASHBOARD  INVENTAIRES', href='/') # Lien vers la page 1
 ])
 
 # Callback pour afficher la page correspondante en fonction de l'URL
 @app.callback(Output('page-content', 'children'),
               [Input('url', 'pathname')])
 def display_page(pathname):
-    if pathname == '/':
+    if pathname == '/': 
         return page_1_layout
     elif pathname == '/page-2':
         return page_2_layout
@@ -2414,9 +2368,10 @@ def update_current_time(n_intervals):
     Input('month-dropdown', 'value'),
     Input('year-dropdown', 'value'),
     Input('categorie-dropdown', 'value'),
-    Input('sous-categorie-dropdown', 'value')
+    Input('sous-categorie-dropdown', 'value'),
+    [Input('url', 'pathname')]
 )
-def update_visualizations(selected_months, selected_years, selected_categories, selected_sous_categories):
+def update_visualizations(selected_months, selected_years, selected_categories, selected_sous_categories,pathname):
     if selected_months is None or selected_years is None:
         return html.Div()
 
@@ -2468,8 +2423,9 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
     tmb = generate_combined_bar_chart3(file_path, categories) 
     figl = create_sales_dashboard(dfl)
 
-
-    return html.Div([
+    if pathname == '/': 
+        
+        return html.Div([
                 html.Div([
                     html.Div([
                         html.Div([
@@ -2852,6 +2808,42 @@ def update_visualizations(selected_months, selected_years, selected_categories, 
 
 
         ], className="row")
+
+    elif pathname == '/page-2':
+        
+        return html.Div([
+                html.Div([
+                    html.Div([
+                        html.Div([
+                            html.H3("Poids de chaque catégorie sur le chiffre d'affaires global".upper(), 
+                                    className="card-title",
+                                    style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras
+                        ], className="card-header"),
+                        html.Div([
+                            html.Div([
+                                html.Div(dcc.Graph(figure=fig_pie_chart_weight_on_revenue.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                            ], className="card-body pad table-responsive p-0")
+                        ], className="card-body")
+                    ], className="card card-primary card-outline")
+                ], className="col-md-6"),
+
+         
+         html.Div([
+            html.Div([
+                html.Div([
+                    html.H3("Coûts des Ventes".upper(),#Répartition des charges par catégorie
+                             className="card-title",style={'font-weight': 'bold','font-size': '28px'})  # Ajoutez ici le style CSS pour le gras)
+                ], className="card-header"),
+                html.Div([
+                    html.Div([
+                        html.Div(dcc.Graph(figure=fig.update_layout(margin=dict(t=0, b=0, l=0, r=0)))),
+                    ], className="card-body pad table-responsive p-0")
+                ], className="card-body")
+            ], className="card card-primary card-outline")
+        ], className="col-md-6"),
+
+        ], className="row")
+
 
 
 #if __name__ == '__main__':
